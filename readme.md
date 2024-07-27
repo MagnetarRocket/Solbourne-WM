@@ -1,3 +1,5 @@
+![Soulbourne S-4000](Soulbourne-s4000.jpg)
+
 # Solbourne Window Manager (swm)
 
 The legendary swm, the reason why i'm not uncompressing the whole thing and just leaving the tar
