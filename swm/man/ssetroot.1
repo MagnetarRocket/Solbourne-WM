@@ -1,0 +1,127 @@
+.TH SSETROOT 1 "13 October 1989" "X Version 11"
+.sp
+.SH NAME
+.PP
+.B ssetroot 
+\- virtual desktop window parameter setting utility for X
+.sp
+.SH SYNOPSIS
+.PP
+\f3ssetroot [ -help ] [ -def ] [ -display \f2display\f3 ] 
+.br
+      [ -cursor \f2cursorfile maskfile\f3 ] [ -bitmap \f2filename\f3 ]
+.br
+      [ -mod \f2x y\f3 ] [ -gray] [ -grey ] [ -fg \f2color\f3 ]
+.br
+      [ -bg \f2color\f3 ] [ -rv ] [ -solid \f2color\f3 ]
+.br
+      [ -name \f2string\f3 ]\f1
+.sp
+.SH DESCRIPTION
+.PP
+The \f3ssetroot\f1 program allows you to tailor the 
+appearance of the background virtual desktop window on a 
+workstation display running X with the \f3swm\f1\|(1) window manager.  
+The virtual desktop feature of \f3swm\f1 need not be enabled; \f3ssetroot\f1
+will work properly whether it is or not.  The function is essentially
+the same as \f3xsetroot\f1 except that if the virtual desktop
+is enabled the actions apply to it rather than the
+root window.
+.PP
+Normally, you experiment with
+\f3ssetroot\f1 until you find a personalized look that you like, then put the
+\f3ssetroot\f1 command that produces it into your X startup file.  
+If no options
+are specified, or if \f3-def\f1 is specified, the window is 
+reset to its default state.  The
+\f3-def\f1 option can be specified along with other options 
+and only the non-specified
+characteristics will be reset to the default state.
+.PP
+Only one of the background color/tiling changing 
+options (\f3-solid\f1, \f3-gray\f1,
+\f3-grey\f1, \f3-bitmap\f1, and \f3-mod\f1) may be specified at a time.
+.sp
+.SH OPTIONS
+.PP
+The various options are as follows:
+.PP
+.TP 8
+\f3-help\f1
+Print a usage message and exit.
+.PP
+.TP 8
+\f3-def\f1
+Reset unspecified attributes to the default values.  (Restores the background
+to the familiar gray mesh and the cursor to the hollow x shape.)
+.PP
+.TP 8
+\f3-cursor \f2cursorfile maskfile\f1
+This lets you change the pointer cursor to whatever
+you want when the pointer cursor is outside of any window.
+Cursor and mask files are bitmaps (little pictures), and can be made with the
+\f3bitmap\f1\|(1) program.  You probably want the mask file to be all black until you
+get used to the way masks work.
+.PP
+.TP 8
+\f3-bitmap \f2filename\f1
+Use the bitmap specified in the file to set the window pattern.  You can
+make your own bitmap files (little pictures) using the \f3bitmap\f1\|(1)
+program.  The entire background will be made up of repeated ``tiles'' of the bitmap.
+.PP
+.TP 8
+\f3-mod \f2x y\f1
+This is used if you want a plaid-like grid pattern on your screen.
+x and y are integers ranging from 1 to 16.  Try the different combinations.
+Zero and negative numbers are taken as 1.
+.PP
+.TP 8
+\f3-gray\f1
+Make the entire background gray.  (Easier on the eyes.)
+.PP
+.TP 8
+\f3-grey\f1
+Make the entire background grey.
+.PP
+.TP 8
+\f3-fg \f2color\f1
+Use \f2color\f1 as the foreground color.  Foreground and background colors
+are meaningful only in combination with \f3-cursor\f1, \f3-bitmap\f1, or \f3-mod\f1.
+.PP
+.TP 8
+\f3-bg \f2color\f1
+Use \f2color\f1 as the background color.  
+.TP 8
+\f3-rv\f1
+This exchanges the foreground and background colors.  Normally the foreground
+color is black and the background color is white.
+.PP
+.TP 8
+\f3-solid \f2color\f1
+Set the window color to \f2color\f1.
+.PP
+.TP 8
+\f3-name \f2string\f1
+Set the name of the root window or virtual desktop 
+to \f2string\f1.  There is no default value.
+Usually a name is assigned to a window so that the
+window manager can use a text representation when the window is iconified.
+This option is unused since you can't iconify the background.
+.PP
+.TP 8
+\f3-display \f2display\f1
+Specifies the server to connect to; see \f3X\f1\|(1)\f1.
+.sp
+.SH "SEE ALSO"
+.PP
+\f3swm\f1\|(1), \f3X\f1\|(1), \f3xrdb\f1\|(1), \f3xset\f1\|(1)
+.sp
+.SH COPYRIGHT
+.PP
+Copyright \(co, ParcPlace Systems, Inc.
+.sp
+.SH AUTHOR
+.PP
+Mark Lillibridge, MIT Project Athena
+.br
+Virtual desktop enhancement by Tom LaStrange, ParcPlace Systems, Inc.

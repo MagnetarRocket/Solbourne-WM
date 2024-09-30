@@ -1,0 +1,101 @@
+       PROGRAMS = swm
+        SOLOILIB=-lOI
+LOCAL_LIBRARIES = $(SOLOILIB) $(XLIB)
+      OTHERSRCS = gram.Y lex.L
+        INCLUDES = -DSHAPE
+        CDEBUGFLAGS =
+	CC=CC
+
+#define IHaveSubdirs
+#define PassCDebugFlags 'CDEBUGFLAGS=$(CDEBUGFLAGS)'
+        SUBDIRS = config
+
+MOST_SRCS = atoms.C bitmap.C button.C cursor.C debug.C events.C execute.C\
+	icons.C init.C list.C main.C menus.C move.C object.C\
+	pan.C panel.C parse.C quarks.C region.C reparent.C resize.C swmhelp.C \
+	text.C util.C version.C wmdata.C
+
+EXTRA_C_SRCS = gram.C lex.C
+
+EXTRA_SRCS = gram.Y lex.L
+
+SRCS = $(EXTRA_C_SRCS) $(MOST_SRCS) 
+INSTALL_SRCS = $(EXTRA_SRCS) $(MOST_SRCS)
+
+OBJS = gram.o atoms.o bitmap.o button.o cursor.o debug.o events.o execute.o\
+	icons.o init.o lex.o list.o main.o menus.o move.o object.o\
+	pan.o panel.o parse.o quarks.o region.o reparent.o resize.o swmhelp.o \
+	text.o util.o version.o wmdata.o
+
+.SUFFIXES:
+.SUFFIXES: .C .C~ .o $(SUFFIXES)
+
+COMPILE.C = $(CC) $(CFLAGS) -c
+
+.C.o:
+	$(COMPILE.C) $(CPPFLAGS) $(OUTPUT_OPTION) $<
+
+all::		$(PROGRAMS)
+
+depend:: lex.C gram.C
+
+MakeDirectories(install, $(BINDIR))
+ComplexProgramTarget(swm)
+
+/**/# KLUDGE to get gram.H made on the hp
+$(OBJS): gram.H
+
+gram.C: gram.Y
+	yacc -d gram.Y
+	sed -e "s/free(/free((char*)/g" < y.tab.c > gram.C
+	$(RM) y.tab.h
+
+gram.H: gram.Y
+	yacc -d gram.Y
+	$(RM) y.tab.c
+	$(MV) y.tab.h gram.H
+
+lex.C: lex.L
+	lex -t lex.L > lex.C
+
+clean::
+	$(RM) y.tab.h y.tab.c gram.H gram.C
+
+MakeSubdirs($(SUBDIRS))
+DependSubdirs($(SUBDIRS))
+
+SWMSRCDIR = $(DESTDIR)/swm
+CONFIG_MK = config.mk
+HEADERS = \
+	atoms.H bitmap.H button.H cursor.H debug.H events.H execute.H \
+	gram.H hm.H icons.H init.H list.H main.H malloc.H menus.H \
+	motif.H move.H object.H ol.H pan.H panel.H parse.H quarks.H \
+	region.H reparent.H resize.H screen.H shape.H swm.H swmhelp.H \
+	swmhints.H swmstart.H text.H util.H version.H wmdata.H
+
+XBMS = \
+	gray.xbm gray3.xbm hglass.xbm hglassm.xbm kelly.xbm root.xbm toml.xbm
+
+install_src::	$(CONFIG_MK)
+
+$(CONFIG_MK):
+	@echo "Making $(CONFIG_MK)"
+	@echo -n "OBJS = " 					>  $(CONFIG_MK)
+	@for i in $(OBJS) ;\
+	do \
+	echo '	\'						>> $(CONFIG_MK); \
+	echo -n "	$$i" 					>> $(CONFIG_MK); \
+	done
+	@echo 							 >> $(CONFIG_MK);
+
+MakeDirectories(install_src, $(SWMSRCDIR))
+InstallMultipleDestFlags(install_src, $(INSTALL_SRCS) $(HEADERS) $(XBMS) $(CONFIG_MK), $(SWMSRCDIR), $(INSTDATFLAGS))
+InstallMultipleDestFlags(install_src, makefile.site, $(SWMSRCDIR)/Makefile, $(INSTDATFLAGS))
+
+install_src::
+	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
+	for i in $(SUBDIRS) ;\
+	do \
+	(cd $$i ; echo "installing_src" "in $(CURRENT_DIR)/$$i..."; \
+	$(MAKE) $(MFLAGS) DESTDIR='$(DESTDIR)' SWMSRCDIR='$(SWMSRCDIR)' install_src); \
+	done

@@ -1,0 +1,69 @@
+include ../config.mk
+include config.mk
+LEVELS = ..
+
+#
+# Force DEBUG to -g by adding it to EXTRA_DEFINES.
+# swm must be comiled at -O1 or higher. -O1 doesn't
+# override -O, but -g does.
+#
+EXTRA_DEFINES = -g -DSHAPE 
+
+
+SUBDIRS = config
+	
+all: swm
+	@for dir in $(SUBDIRS) ; \
+	do \
+		echo making in swm/$$dir ;\
+		( cd $$dir; $(MAKE) $(MFLAGS) C++="$(C++)" DEBUG="$(DEBUG)"  DEFINES="$(DEFINES)" ) ;\
+	done 
+
+swm: gram.H $(OBJS)
+	$(C++) $(LDFLAGS) $(OBJS) $(LDLIBS) -o swm
+
+gram.H:
+	yacc -d gram.Y
+	mv y.tab.h gram.H
+
+lex.C: lex.L
+	lex -t lex.L > lex.C
+
+gram.C: gram.Y
+	yacc gram.Y
+	sed -e "s/free(/free((char*)/g" < y.tab.c > gram.C
+
+clean:
+	-$(RM) swm
+	for dir in $(SUBDIRS) ; \
+	do \
+		echo cleaning in swm/$$dir ;\
+		( cd $$dir; $(MAKE) $(MFLAGS) clean ) ;\
+	done 
+
+clobber: clean
+	-$(RM) $(OBJS) gram.H gram.C lex.C
+	@for dir in $(SUBDIRS) ; \
+	do \
+		echo clobbering in swm/$$dir ;\
+		( cd $$dir; $(MAKE) $(MFLAGS) clobber ) ;\
+	done 
+
+depend: gram.C lex.C
+	$(DEPEND) -s "# DO NOT DELETE"  -- -DSHAPE $(DEFINES) $(DEPINCLUDES) -- $(SRCS)
+	@for dir in $(SUBDIRS) ; \
+	do \
+		echo depending in swm/$$dir ;\
+		( cd $$dir; $(MAKE) $(MFLAGS) C++="$(C++)" DEBUG="$(DEBUG)"  DEFINES="$(DEFINES)" depend ) ;\
+	done 
+
+install:
+	-if [ ! -d $(BINDIR) ] ; then \
+		$(MKDIR) $(BINDIR); fi
+	$(INSTALL) $(INSTBINFLAGS) swm $(BINDIR)
+	@for dir in $(SUBDIRS) ; \
+	do \
+		echo installing in swm/$$dir ;\
+		( cd $$dir; $(MAKE) $(MFLAGS) DESTDIR="$(DESTDIR)" install ) ;\
+	done 
+

@@ -1,0 +1,1649 @@
+#ifdef __cplusplus
+   #include <stdio.h>
+   extern "C" {
+     // extern void yyerror(char *);
+     extern int yylex();
+   }
+#endif	/* __cplusplus */ 
+
+# line 2 "gram.Y"
+/*****************************************************************************
+ *
+ * Copyright 1989-1993 ParcPlace Systems
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose and without fee is hereby granted, provided
+ * that the above copyright notice appear in all copies and that both that
+ * copyright notice and this permission notice appear in supporting
+ * documentation, and that the name of ParcPlace not be used in advertising or
+ * publicity pertaining to distribution of the software without specific,
+ * written prior permission.  ParcPlace makes no representations about the
+ * suitability of this software for any purpose.  It is provided "as is"
+ * without express or implied warranty.
+ *
+ * ParcPlace DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+ * EVENT SHALL ParcPlace BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+ * CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF
+ * USE, DATA  OR  PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ *
+ ******************************************************************************/
+/******************************************************************************
+ *
+ * $Id: gram.C.hp,v 1.3 1993/08/27 16:58:15 toml Exp $
+ *
+ * Description:
+ *	Grammer
+ *
+ * Author: Tom LaStrange
+ *
+ ******************************************************************************/
+
+#ifndef lint
+static char RCSinfo[] =
+"$Id: gram.C.hp,v 1.3 1993/08/27 16:58:15 toml Exp $";
+#endif /* lint */
+
+#include "swm.H"
+#include "list.H"
+#include "panel.H"
+#include "debug.H"
+#include "execute.H"
+#include "menus.H"
+#include "region.H"
+#include "util.H"
+
+#define PARAMETERS 100
+
+/* extern "C" { void yyerror(char *); }*/
+extern void yyerror(char *);
+extern int yylex();
+
+static wmGeometry geom;
+static int mask;
+static unsigned mods;
+static int what;
+static int argc;
+static char *argv[PARAMETERS];
+
+static void 
+resetArgs()
+{
+    argc = 0;
+    argv[0] = NULL;
+}
+
+
+# line 55 "gram.Y"
+typedef union 
+{
+    int num;
+    char *ptr;
+    char *g;
+} YYSTYPE;
+# define F_RAISE 257
+# define F_LOWER 258
+# define F_ICONIFY 259
+# define F_DEICONIFY 260
+# define F_RESTART 261
+# define F_QUIT 262
+# define F_GROUP 263
+# define F_MOVE 264
+# define F_RESIZE 265
+# define F_BEEP 266
+# define F_CIRCLEDOWN 267
+# define F_CIRCLEUP 268
+# define F_UNGROUP 269
+# define F_DESTROY 270
+# define F_EXEC 271
+# define F_FOCUS 272
+# define F_IDENTIFY 273
+# define F_NOP 274
+# define F_RAISELOWER 275
+# define F_REFRESH 276
+# define F_UNFOCUS 277
+# define F_WINREFRESH 278
+# define F_WARPTO 279
+# define F_MENU 280
+# define F_TITLE 281
+# define F_STOP 282
+# define F_MOVEOPAQUE 283
+# define F_PACK 284
+# define F_KILL 285
+# define F_MAP 286
+# define F_UNMAP 287
+# define F_MACRO 288
+# define F_STRING 289
+# define F_ZOOM 290
+# define F_HORIZOOM 291
+# define F_VERTZOOM 292
+# define F_SAVE 293
+# define F_RESTORE 294
+# define F_RESTOREPOINTER 295
+# define F_WARPHORIZONTAL 296
+# define F_WARPVERTICAL 297
+# define F_SAVEPOINTER 298
+# define F_WARPTOSCREEN 299
+# define F_SHUTDOWN 300
+# define F_DELETE 301
+# define F_TITLEPIN 302
+# define F_REGROUP 303
+# define F_SQUEEZE 304
+# define F_FORCEMOVE 305
+# define F_PANNER 306
+# define F_SCROLLLEFT 307
+# define F_SCROLLRIGHT 308
+# define F_SCROLLUP 309
+# define F_SCROLLDOWN 310
+# define F_STICK 311
+# define F_UNSTICK 312
+# define F_SCROLLHOME 313
+# define F_FALSESTOP 314
+# define F_SCROLL 315
+# define F_RECONFIG 316
+# define F_GETRESOURCE 317
+# define F_PIN 318
+# define F_UNPIN 319
+# define F_QUERY 320
+# define F_SCROLLTO 321
+# define F_SAVEVROOT 322
+# define F_RESTOREVROOT 323
+# define F_WARPSAVE 324
+# define F_SCROLLSAVE 325
+# define F_PLACES 326
+# define F_CONSTRAINMOVE 327
+# define F_REBIND 328
+# define F_NEWBUTTONIMAGE 329
+# define F_ANIMATEBUTTON 330
+# define F_DUMP 331
+# define F_AUTORESIZE 332
+# define F_SWEEP 333
+# define F_UNSWEEP 334
+# define F_HARDRESTART 335
+# define F_HANDLEDROP 336
+# define F_ROUNDUP 337
+# define F_SETDESKTOP 338
+# define F_FREEZEDESKTOP 339
+# define F_THAWDESKTOP 340
+# define F_OWNER 341
+# define F_FOCUSCOLOR 342
+# define F_TERMINALPLACES 343
+# define WM_STRINGS 344
+# define WM_PANEL 345
+# define WM_REGION 346
+# define WM_BINDING 347
+# define WM_FUNCTION 348
+# define WM_MENU 349
+# define WM_ST 350
+# define OBJ_PANEL 351
+# define OBJ_BUTTON 352
+# define OBJ_TEXT 353
+# define OBJ_MENU 354
+# define OBJ_MENUBAR 355
+# define PLUS 356
+# define MINUS 357
+# define TIMES 358
+# define LP 359
+# define RP 360
+# define SHIFT 361
+# define CTRL 362
+# define META 363
+# define BINDINGS 364
+# define MAPPED 365
+# define MAPPED_NO_SPACE 366
+# define UNMAPPED 367
+# define UNMAPPED_NO_SPACE 368
+# define KEY 369
+# define BTN 370
+# define BTN1 371
+# define BTN2 372
+# define BTN3 373
+# define BTN4 374
+# define BTN5 375
+# define DROP 376
+# define DROP1 377
+# define DROP2 378
+# define DROP3 379
+# define DROP4 380
+# define DROP5 381
+# define STRING 382
+# define F_GRAVITY 383
+# define F_RESHUFFLE 384
+# define F_INFO 385
+#define yyclearin yychar = -1
+#define yyerrok yyerrflag = 0
+extern int yychar;
+#ifndef YYMAXDEPTH
+#define YYMAXDEPTH 150
+#endif
+
+/* __YYSCLASS defines the scoping/storage class for global objects
+ * that are NOT renamed by the -p option.  By default these names
+ * are going to be 'static' so that multi-definition errors
+ * will not occur with multiple parsers.
+ * If you want (unsupported) access to internal names you need
+ * to define this to be null so it implies 'extern' scope.
+ * This should not be used in conjunction with -p.
+ */
+#ifndef __YYSCLASS
+# define __YYSCLASS static
+#endif
+YYSTYPE yylval;
+__YYSCLASS YYSTYPE yyval;
+typedef int yytabelem;
+# define YYERRCODE 256
+
+# line 361 "gram.Y"
+
+__YYSCLASS yytabelem yyexca[] ={
+-1, 1,
+	0, -1,
+	-2, 0,
+-1, 2,
+	0, 1,
+	-2, 0,
+-1, 30,
+	0, 9,
+	256, 9,
+	344, 9,
+	345, 9,
+	346, 9,
+	347, 9,
+	348, 9,
+	349, 9,
+	350, 9,
+	-2, 50,
+	};
+# define YYNPROD 163
+# define YYLAST 272
+__YYSCLASS yytabelem yyact[]={
+
+    46,    47,    48,    49,    50,    51,    56,    52,    55,    59,
+    60,    61,    57,    62,    63,    64,    65,    66,    67,    68,
+    69,    70,    71,    72,    73,    75,    54,    76,    78,    81,
+    82,    83,    84,    85,    86,    87,    88,    89,    91,    92,
+    93,    90,    94,    79,    80,    74,    58,    77,    53,    95,
+    96,    97,    98,    99,   100,   101,   102,   103,   104,   105,
+   106,   107,   108,   109,   110,   111,   112,   113,   114,   115,
+   116,   117,   118,   119,   120,   121,   122,   123,   124,   125,
+   126,   127,   128,   129,   133,   134,   135,   155,    20,    34,
+    35,    36,    37,    42,     4,   162,   146,   147,   145,   171,
+    44,    31,   166,    28,   148,    21,   150,   151,   152,   153,
+   154,   156,   157,   158,   159,   160,   161,    45,   142,   149,
+   144,    20,   170,   143,   164,   141,   130,   131,   132,    23,
+    24,    25,    26,    27,    43,    19,    41,    29,    40,   168,
+   163,   136,    33,    18,    32,    38,    17,    16,    30,    15,
+    14,    13,    39,    12,     3,   137,     2,     1,    22,     0,
+     0,   138,   139,     0,     0,   140,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     5,     6,     7,     8,     9,    10,    11,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,   167,   169,     0,     0,   172,
+     0,   165 };
+__YYSCLASS yytabelem yypact[]={
+
+ -3000, -3000,  -162, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000,  -294,  -222,  -294, -3000, -3000, -3000,  -276, -3000,
+ -3000, -3000,  -294, -3000, -3000, -3000, -3000, -3000, -3000,  -294,
+  -271,  -257,  -294, -3000, -3000, -3000, -3000, -3000,  -294,  -294,
+ -3000, -3000,  -294,  -265, -3000,  -264, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,  -294, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000, -3000,
+ -3000, -3000, -3000, -3000, -3000, -3000,  -294,  -261,  -257,  -257,
+ -3000, -3000, -3000 };
+__YYSCLASS yytabelem yypgo[]={
+
+     0,   158,   122,   157,   156,   154,   153,   151,   150,   149,
+   148,   147,   101,   146,   144,   143,   142,   141,   140,   139,
+   100,   138,   136,   134,   125,   124,   123,   120,   119,   102,
+   118,   117,   105,   103 };
+__YYSCLASS yytabelem yyr1[]={
+
+     0,     3,     4,     4,     5,     5,     5,     5,     9,     5,
+    11,     5,    13,     5,    15,     5,    16,    16,    16,    16,
+    14,    14,    18,    17,    19,    19,    10,    10,    10,    21,
+    25,    22,    24,    24,    26,    27,    29,    29,    28,    28,
+    28,    28,    28,    28,    28,    28,    28,    28,    28,    28,
+    23,    23,    30,    30,    30,    12,    12,    20,    20,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,    31,
+    31,    31,    31,    31,    31,    31,    31,    31,    31,     7,
+     7,    32,     8,     8,    33,     1,     1,     1,     1,     1,
+     6,     6,     2 };
+__YYSCLASS yytabelem yyr2[]={
+
+     0,     2,     0,     4,     2,     4,     4,     4,     1,     6,
+     1,     6,     1,     6,     1,     6,     3,     3,     3,     3,
+     0,     4,     1,     7,     0,     5,     0,     4,     4,     5,
+     1,     9,     2,     2,     5,     4,     0,     5,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     0,     4,     3,     3,     3,     0,     5,     8,     2,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     3,     3,     3,     0,
+     4,     7,     0,     4,     7,     3,     3,     3,     3,     3,
+     0,     5,     3 };
+__YYSCLASS yytabelem yychk[]={
+
+ -3000,    -3,    -4,    -5,   256,   344,   345,   346,   347,   348,
+   349,   350,    -6,    -7,    -8,    -9,   -11,   -13,   -15,    -2,
+   382,   -32,    -1,   351,   352,   353,   354,   355,   -33,    -2,
+   -10,   -12,   -14,   -16,   365,   366,   367,   368,    -2,    -2,
+   -21,   -22,   364,   -23,   -20,   -31,   257,   258,   259,   260,
+   261,   262,   264,   305,   283,   265,   263,   269,   303,   266,
+   267,   268,   270,   271,   272,   273,   274,   275,   276,   277,
+   278,   279,   280,   281,   302,   282,   284,   304,   285,   300,
+   301,   286,   287,   288,   289,   290,   291,   292,   293,   294,
+   298,   295,   296,   297,   299,   306,   307,   308,   309,   310,
+   311,   312,   313,   314,   315,   316,   317,   318,   319,   320,
+   321,   322,   323,   324,   325,   326,   327,   328,   329,   330,
+   331,   332,   333,   334,   335,   336,   337,   338,   339,   340,
+   383,   384,   385,   341,   342,   343,   -17,    -2,    -2,    -2,
+    -2,   -24,   -30,   -26,   -27,   363,   361,   362,   369,   -28,
+   371,   372,   373,   374,   375,   352,   376,   377,   378,   379,
+   380,   381,   359,   -18,   -25,    -2,   -29,   -29,   -19,   -12,
+    -2,   360,   -20 };
+__YYSCLASS yytabelem yydef[]={
+
+     2,    -2,    -2,     3,     4,   160,   149,   152,     8,    10,
+    12,    14,     5,     6,     7,    26,    55,    20,     0,   161,
+   162,   150,     0,   155,   156,   157,   158,   159,   153,     0,
+    -2,    11,    13,    15,    16,    17,    18,    19,     0,     0,
+    27,    28,     0,     0,    56,    58,    59,    60,    61,    62,
+    63,    64,    65,    66,    67,    68,    69,    70,    71,    72,
+    73,    74,    75,    76,    77,    78,    79,    80,    81,    82,
+    83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
+    93,    94,    95,    96,    97,    98,    99,   100,   101,   102,
+   103,   104,   105,   106,   107,   108,   109,   110,   111,   112,
+   113,   114,   115,   116,   117,   118,   119,   120,   121,   122,
+   123,   124,   125,   126,   127,   128,   129,   130,   131,   132,
+   133,   134,   135,   136,   137,   138,   139,   140,   141,   142,
+   143,   144,   145,   146,   147,   148,    21,    22,   151,   154,
+    29,    30,    51,    32,    33,    52,    53,    54,     0,    36,
+    38,    39,    40,    41,    42,    43,    44,    45,    46,    47,
+    48,    49,    36,    24,    55,    34,    35,     0,    23,    31,
+    37,    57,    25 };
+typedef struct { char *t_name; int t_val; } yytoktype;
+#ifndef YYDEBUG
+#	define YYDEBUG	0	/* don't allow debugging */
+#endif
+
+#if YYDEBUG
+
+__YYSCLASS yytoktype yytoks[] =
+{
+	"F_RAISE",	257,
+	"F_LOWER",	258,
+	"F_ICONIFY",	259,
+	"F_DEICONIFY",	260,
+	"F_RESTART",	261,
+	"F_QUIT",	262,
+	"F_GROUP",	263,
+	"F_MOVE",	264,
+	"F_RESIZE",	265,
+	"F_BEEP",	266,
+	"F_CIRCLEDOWN",	267,
+	"F_CIRCLEUP",	268,
+	"F_UNGROUP",	269,
+	"F_DESTROY",	270,
+	"F_EXEC",	271,
+	"F_FOCUS",	272,
+	"F_IDENTIFY",	273,
+	"F_NOP",	274,
+	"F_RAISELOWER",	275,
+	"F_REFRESH",	276,
+	"F_UNFOCUS",	277,
+	"F_WINREFRESH",	278,
+	"F_WARPTO",	279,
+	"F_MENU",	280,
+	"F_TITLE",	281,
+	"F_STOP",	282,
+	"F_MOVEOPAQUE",	283,
+	"F_PACK",	284,
+	"F_KILL",	285,
+	"F_MAP",	286,
+	"F_UNMAP",	287,
+	"F_MACRO",	288,
+	"F_STRING",	289,
+	"F_ZOOM",	290,
+	"F_HORIZOOM",	291,
+	"F_VERTZOOM",	292,
+	"F_SAVE",	293,
+	"F_RESTORE",	294,
+	"F_RESTOREPOINTER",	295,
+	"F_WARPHORIZONTAL",	296,
+	"F_WARPVERTICAL",	297,
+	"F_SAVEPOINTER",	298,
+	"F_WARPTOSCREEN",	299,
+	"F_SHUTDOWN",	300,
+	"F_DELETE",	301,
+	"F_TITLEPIN",	302,
+	"F_REGROUP",	303,
+	"F_SQUEEZE",	304,
+	"F_FORCEMOVE",	305,
+	"F_PANNER",	306,
+	"F_SCROLLLEFT",	307,
+	"F_SCROLLRIGHT",	308,
+	"F_SCROLLUP",	309,
+	"F_SCROLLDOWN",	310,
+	"F_STICK",	311,
+	"F_UNSTICK",	312,
+	"F_SCROLLHOME",	313,
+	"F_FALSESTOP",	314,
+	"F_SCROLL",	315,
+	"F_RECONFIG",	316,
+	"F_GETRESOURCE",	317,
+	"F_PIN",	318,
+	"F_UNPIN",	319,
+	"F_QUERY",	320,
+	"F_SCROLLTO",	321,
+	"F_SAVEVROOT",	322,
+	"F_RESTOREVROOT",	323,
+	"F_WARPSAVE",	324,
+	"F_SCROLLSAVE",	325,
+	"F_PLACES",	326,
+	"F_CONSTRAINMOVE",	327,
+	"F_REBIND",	328,
+	"F_NEWBUTTONIMAGE",	329,
+	"F_ANIMATEBUTTON",	330,
+	"F_DUMP",	331,
+	"F_AUTORESIZE",	332,
+	"F_SWEEP",	333,
+	"F_UNSWEEP",	334,
+	"F_HARDRESTART",	335,
+	"F_HANDLEDROP",	336,
+	"F_ROUNDUP",	337,
+	"F_SETDESKTOP",	338,
+	"F_FREEZEDESKTOP",	339,
+	"F_THAWDESKTOP",	340,
+	"F_OWNER",	341,
+	"F_FOCUSCOLOR",	342,
+	"F_TERMINALPLACES",	343,
+	"WM_STRINGS",	344,
+	"WM_PANEL",	345,
+	"WM_REGION",	346,
+	"WM_BINDING",	347,
+	"WM_FUNCTION",	348,
+	"WM_MENU",	349,
+	"WM_ST",	350,
+	"OBJ_PANEL",	351,
+	"OBJ_BUTTON",	352,
+	"OBJ_TEXT",	353,
+	"OBJ_MENU",	354,
+	"OBJ_MENUBAR",	355,
+	"PLUS",	356,
+	"MINUS",	357,
+	"TIMES",	358,
+	"LP",	359,
+	"RP",	360,
+	"SHIFT",	361,
+	"CTRL",	362,
+	"META",	363,
+	"BINDINGS",	364,
+	"MAPPED",	365,
+	"MAPPED_NO_SPACE",	366,
+	"UNMAPPED",	367,
+	"UNMAPPED_NO_SPACE",	368,
+	"KEY",	369,
+	"BTN",	370,
+	"BTN1",	371,
+	"BTN2",	372,
+	"BTN3",	373,
+	"BTN4",	374,
+	"BTN5",	375,
+	"DROP",	376,
+	"DROP1",	377,
+	"DROP2",	378,
+	"DROP3",	379,
+	"DROP4",	380,
+	"DROP5",	381,
+	"STRING",	382,
+	"F_GRAVITY",	383,
+	"F_RESHUFFLE",	384,
+	"F_INFO",	385,
+	"-unknown-",	-1	/* ends search */
+};
+
+__YYSCLASS char * yyreds[] =
+{
+	"-no such reduction-",
+	"swmrc : stmts",
+	"stmts : /* empty */",
+	"stmts : stmts stmt",
+	"stmt : error",
+	"stmt : WM_STRINGS strings",
+	"stmt : WM_PANEL panel_entries",
+	"stmt : WM_REGION region_entries",
+	"stmt : WM_BINDING",
+	"stmt : WM_BINDING bindings",
+	"stmt : WM_FUNCTION",
+	"stmt : WM_FUNCTION functions",
+	"stmt : WM_MENU",
+	"stmt : WM_MENU menu_entries",
+	"stmt : WM_ST",
+	"stmt : WM_ST object_states",
+	"object_states : MAPPED",
+	"object_states : MAPPED_NO_SPACE",
+	"object_states : UNMAPPED",
+	"object_states : UNMAPPED_NO_SPACE",
+	"menu_entries : /* empty */",
+	"menu_entries : menu_entries menu_entry",
+	"menu_entry : string",
+	"menu_entry : string menu_functions",
+	"menu_functions : /* empty */",
+	"menu_functions : menu_functions function",
+	"bindings : /* empty */",
+	"bindings : bindings other_bindings",
+	"bindings : bindings binding",
+	"other_bindings : BINDINGS string",
+	"binding : modifiers key_or_click",
+	"binding : modifiers key_or_click functions",
+	"key_or_click : key",
+	"key_or_click : click",
+	"key : KEY string",
+	"click : button opt_string",
+	"opt_string : /* empty */",
+	"opt_string : opt_string string",
+	"button : BTN1",
+	"button : BTN2",
+	"button : BTN3",
+	"button : BTN4",
+	"button : BTN5",
+	"button : OBJ_BUTTON",
+	"button : DROP",
+	"button : DROP1",
+	"button : DROP2",
+	"button : DROP3",
+	"button : DROP4",
+	"button : DROP5",
+	"modifiers : /* empty */",
+	"modifiers : modifiers modifier",
+	"modifier : META",
+	"modifier : SHIFT",
+	"modifier : CTRL",
+	"functions : /* empty */",
+	"functions : functions function",
+	"function : wm_func LP opt_string RP",
+	"function : wm_func",
+	"wm_func : F_RAISE",
+	"wm_func : F_LOWER",
+	"wm_func : F_ICONIFY",
+	"wm_func : F_DEICONIFY",
+	"wm_func : F_RESTART",
+	"wm_func : F_QUIT",
+	"wm_func : F_MOVE",
+	"wm_func : F_FORCEMOVE",
+	"wm_func : F_MOVEOPAQUE",
+	"wm_func : F_RESIZE",
+	"wm_func : F_GROUP",
+	"wm_func : F_UNGROUP",
+	"wm_func : F_REGROUP",
+	"wm_func : F_BEEP",
+	"wm_func : F_CIRCLEDOWN",
+	"wm_func : F_CIRCLEUP",
+	"wm_func : F_DESTROY",
+	"wm_func : F_EXEC",
+	"wm_func : F_FOCUS",
+	"wm_func : F_IDENTIFY",
+	"wm_func : F_NOP",
+	"wm_func : F_RAISELOWER",
+	"wm_func : F_REFRESH",
+	"wm_func : F_UNFOCUS",
+	"wm_func : F_WINREFRESH",
+	"wm_func : F_WARPTO",
+	"wm_func : F_MENU",
+	"wm_func : F_TITLE",
+	"wm_func : F_TITLEPIN",
+	"wm_func : F_STOP",
+	"wm_func : F_PACK",
+	"wm_func : F_SQUEEZE",
+	"wm_func : F_KILL",
+	"wm_func : F_SHUTDOWN",
+	"wm_func : F_DELETE",
+	"wm_func : F_MAP",
+	"wm_func : F_UNMAP",
+	"wm_func : F_MACRO",
+	"wm_func : F_STRING",
+	"wm_func : F_ZOOM",
+	"wm_func : F_HORIZOOM",
+	"wm_func : F_VERTZOOM",
+	"wm_func : F_SAVE",
+	"wm_func : F_RESTORE",
+	"wm_func : F_SAVEPOINTER",
+	"wm_func : F_RESTOREPOINTER",
+	"wm_func : F_WARPHORIZONTAL",
+	"wm_func : F_WARPVERTICAL",
+	"wm_func : F_WARPTOSCREEN",
+	"wm_func : F_PANNER",
+	"wm_func : F_SCROLLLEFT",
+	"wm_func : F_SCROLLRIGHT",
+	"wm_func : F_SCROLLUP",
+	"wm_func : F_SCROLLDOWN",
+	"wm_func : F_STICK",
+	"wm_func : F_UNSTICK",
+	"wm_func : F_SCROLLHOME",
+	"wm_func : F_FALSESTOP",
+	"wm_func : F_SCROLL",
+	"wm_func : F_RECONFIG",
+	"wm_func : F_GETRESOURCE",
+	"wm_func : F_PIN",
+	"wm_func : F_UNPIN",
+	"wm_func : F_QUERY",
+	"wm_func : F_SCROLLTO",
+	"wm_func : F_SAVEVROOT",
+	"wm_func : F_RESTOREVROOT",
+	"wm_func : F_WARPSAVE",
+	"wm_func : F_SCROLLSAVE",
+	"wm_func : F_PLACES",
+	"wm_func : F_CONSTRAINMOVE",
+	"wm_func : F_REBIND",
+	"wm_func : F_NEWBUTTONIMAGE",
+	"wm_func : F_ANIMATEBUTTON",
+	"wm_func : F_DUMP",
+	"wm_func : F_AUTORESIZE",
+	"wm_func : F_SWEEP",
+	"wm_func : F_UNSWEEP",
+	"wm_func : F_HARDRESTART",
+	"wm_func : F_HANDLEDROP",
+	"wm_func : F_ROUNDUP",
+	"wm_func : F_SETDESKTOP",
+	"wm_func : F_FREEZEDESKTOP",
+	"wm_func : F_THAWDESKTOP",
+	"wm_func : F_GRAVITY",
+	"wm_func : F_RESHUFFLE",
+	"wm_func : F_INFO",
+	"wm_func : F_OWNER",
+	"wm_func : F_FOCUSCOLOR",
+	"wm_func : F_TERMINALPLACES",
+	"panel_entries : /* empty */",
+	"panel_entries : panel_entries panel_entry",
+	"panel_entry : object string string",
+	"region_entries : /* empty */",
+	"region_entries : region_entries region_entry",
+	"region_entry : string string string",
+	"object : OBJ_PANEL",
+	"object : OBJ_BUTTON",
+	"object : OBJ_TEXT",
+	"object : OBJ_MENU",
+	"object : OBJ_MENUBAR",
+	"strings : /* empty */",
+	"strings : strings string",
+	"string : STRING",
+};
+#endif /* YYDEBUG */
+#define YYFLAG  (-3000)
+/* @(#) $Revision: 1.3 $ */    
+
+/*
+** Skeleton parser driver for yacc output
+*/
+
+#if defined(NLS) && !defined(NL_SETN)
+#include <msgbuf.h>
+#endif
+
+#ifndef nl_msg
+#define nl_msg(i,s) (s)
+#endif
+
+/*
+** yacc user known macros and defines
+*/
+#define YYERROR		goto yyerrlab
+
+#ifndef __RUNTIME_YYMAXDEPTH
+#define YYACCEPT	return(0)
+#define YYABORT		return(1)
+#else
+#define YYACCEPT	{free_stacks(); return(0);}
+#define YYABORT		{free_stacks(); return(1);}
+#endif
+
+#define YYBACKUP( newtoken, newvalue )\
+{\
+	if ( yychar >= 0 || ( yyr2[ yytmp ] >> 1 ) != 1 )\
+	{\
+		yyerror( (nl_msg(30001,"syntax error - cannot backup")) );\
+		goto yyerrlab;\
+	}\
+	yychar = newtoken;\
+	yystate = *yyps;\
+	yylval = newvalue;\
+	goto yynewstate;\
+}
+#define YYRECOVERING()	(!!yyerrflag)
+#ifndef YYDEBUG
+#	define YYDEBUG	1	/* make debugging available */
+#endif
+
+/*
+** user known globals
+*/
+int yydebug;			/* set to 1 to get debugging */
+
+/*
+** driver internal defines
+*/
+/* define for YYFLAG now generated by yacc program. */
+/*#define YYFLAG		(FLAGVAL)*/
+
+/*
+** global variables used by the parser
+*/
+# ifndef __RUNTIME_YYMAXDEPTH
+__YYSCLASS YYSTYPE yyv[ YYMAXDEPTH ];	/* value stack */
+__YYSCLASS int yys[ YYMAXDEPTH ];		/* state stack */
+# else
+__YYSCLASS YYSTYPE *yyv;			/* pointer to malloc'ed value stack */
+__YYSCLASS int *yys;			/* pointer to malloc'ed stack stack */
+#ifdef __cplusplus
+	extern char *malloc(int);
+	extern char *realloc(char *, int);
+	extern void free((char*));
+# else
+	extern char *malloc();
+	extern char *realloc();
+	extern void free((char*));
+# endif /* __cplusplus */
+static int allocate_stacks(); 
+static void free_stacks();
+# ifndef YYINCREMENT
+# define YYINCREMENT (YYMAXDEPTH/2) + 10
+# endif
+# endif	/* __RUNTIME_YYMAXDEPTH */
+long  yymaxdepth = YYMAXDEPTH;
+
+__YYSCLASS YYSTYPE *yypv;			/* top of value stack */
+__YYSCLASS int *yyps;			/* top of state stack */
+
+__YYSCLASS int yystate;			/* current state */
+__YYSCLASS int yytmp;			/* extra var (lasts between blocks) */
+
+int yynerrs;			/* number of errors */
+__YYSCLASS int yyerrflag;			/* error recovery flag */
+int yychar;			/* current input token number */
+
+
+
+/*
+** yyparse - return 0 if worked, 1 if syntax error not recovered from
+*/
+int
+yyparse()
+{
+	register YYSTYPE *yypvt;	/* top of value stack for $vars */
+
+	/*
+	** Initialize externals - yyparse may be called more than once
+	*/
+# ifdef __RUNTIME_YYMAXDEPTH
+	if (allocate_stacks()) YYABORT;
+# endif
+	yypv = &yyv[-1];
+	yyps = &yys[-1];
+	yystate = 0;
+	yytmp = 0;
+	yynerrs = 0;
+	yyerrflag = 0;
+	yychar = -1;
+
+	goto yystack;
+	{
+		register YYSTYPE *yy_pv;	/* top of value stack */
+		register int *yy_ps;		/* top of state stack */
+		register int yy_state;		/* current state */
+		register int  yy_n;		/* internal state number info */
+
+		/*
+		** get globals into registers.
+		** branch to here only if YYBACKUP was called.
+		*/
+	yynewstate:
+		yy_pv = yypv;
+		yy_ps = yyps;
+		yy_state = yystate;
+		goto yy_newstate;
+
+		/*
+		** get globals into registers.
+		** either we just started, or we just finished a reduction
+		*/
+	yystack:
+		yy_pv = yypv;
+		yy_ps = yyps;
+		yy_state = yystate;
+
+		/*
+		** top of for (;;) loop while no reductions done
+		*/
+	yy_stack:
+		/*
+		** put a state and value onto the stacks
+		*/
+#if YYDEBUG
+		/*
+		** if debugging, look up token value in list of value vs.
+		** name pairs.  0 and negative (-1) are special values.
+		** Note: linear search is used since time is not a real
+		** consideration while debugging.
+		*/
+		if ( yydebug )
+		{
+			register int yy_i;
+
+			printf( "State %d, token ", yy_state );
+			if ( yychar == 0 )
+				printf( "end-of-file\n" );
+			else if ( yychar < 0 )
+				printf( "-none-\n" );
+			else
+			{
+				for ( yy_i = 0; yytoks[yy_i].t_val >= 0;
+					yy_i++ )
+				{
+					if ( yytoks[yy_i].t_val == yychar )
+						break;
+				}
+				printf( "%s\n", yytoks[yy_i].t_name );
+			}
+		}
+#endif /* YYDEBUG */
+		if ( ++yy_ps >= &yys[ yymaxdepth ] )	/* room on stack? */
+		{
+# ifndef __RUNTIME_YYMAXDEPTH
+			yyerror( (nl_msg(30002,"yacc stack overflow")) );
+			YYABORT;
+# else
+			/* save old stack bases to recalculate pointers */
+			YYSTYPE * yyv_old = yyv;
+			int * yys_old = yys;
+			yymaxdepth += YYINCREMENT;
+			yys = (int *) realloc(yys, yymaxdepth * sizeof(int));
+			yyv = (YYSTYPE *) realloc(yyv, yymaxdepth * sizeof(YYSTYPE));
+			if (yys==0 || yyv==0) {
+			    yyerror( (nl_msg(30002,"yacc stack overflow")) );
+			    YYABORT;
+			    }
+			/* Reset pointers into stack */
+			yy_ps = (yy_ps - yys_old) + yys;
+			yyps = (yyps - yys_old) + yys;
+			yy_pv = (yy_pv - yyv_old) + yyv;
+			yypv = (yypv - yyv_old) + yyv;
+# endif
+
+		}
+		*yy_ps = yy_state;
+		*++yy_pv = yyval;
+
+		/*
+		** we have a new state - find out what to do
+		*/
+	yy_newstate:
+		if ( ( yy_n = yypact[ yy_state ] ) <= YYFLAG )
+			goto yydefault;		/* simple state */
+#if YYDEBUG
+		/*
+		** if debugging, need to mark whether new token grabbed
+		*/
+		yytmp = yychar < 0;
+#endif
+		if ( ( yychar < 0 ) && ( ( yychar = yylex() ) < 0 ) )
+			yychar = 0;		/* reached EOF */
+#if YYDEBUG
+		if ( yydebug && yytmp )
+		{
+			register int yy_i;
+
+			printf( "Received token " );
+			if ( yychar == 0 )
+				printf( "end-of-file\n" );
+			else if ( yychar < 0 )
+				printf( "-none-\n" );
+			else
+			{
+				for ( yy_i = 0; yytoks[yy_i].t_val >= 0;
+					yy_i++ )
+				{
+					if ( yytoks[yy_i].t_val == yychar )
+						break;
+				}
+				printf( "%s\n", yytoks[yy_i].t_name );
+			}
+		}
+#endif /* YYDEBUG */
+		if ( ( ( yy_n += yychar ) < 0 ) || ( yy_n >= YYLAST ) )
+			goto yydefault;
+		if ( yychk[ yy_n = yyact[ yy_n ] ] == yychar )	/*valid shift*/
+		{
+			yychar = -1;
+			yyval = yylval;
+			yy_state = yy_n;
+			if ( yyerrflag > 0 )
+				yyerrflag--;
+			goto yy_stack;
+		}
+
+	yydefault:
+		if ( ( yy_n = yydef[ yy_state ] ) == -2 )
+		{
+#if YYDEBUG
+			yytmp = yychar < 0;
+#endif
+			if ( ( yychar < 0 ) && ( ( yychar = yylex() ) < 0 ) )
+				yychar = 0;		/* reached EOF */
+#if YYDEBUG
+			if ( yydebug && yytmp )
+			{
+				register int yy_i;
+
+				printf( "Received token " );
+				if ( yychar == 0 )
+					printf( "end-of-file\n" );
+				else if ( yychar < 0 )
+					printf( "-none-\n" );
+				else
+				{
+					for ( yy_i = 0;
+						yytoks[yy_i].t_val >= 0;
+						yy_i++ )
+					{
+						if ( yytoks[yy_i].t_val
+							== yychar )
+						{
+							break;
+						}
+					}
+					printf( "%s\n", yytoks[yy_i].t_name );
+				}
+			}
+#endif /* YYDEBUG */
+			/*
+			** look through exception table
+			*/
+			{
+				register int *yyxi = yyexca;
+
+				while ( ( *yyxi != -1 ) ||
+					( yyxi[1] != yy_state ) )
+				{
+					yyxi += 2;
+				}
+				while ( ( *(yyxi += 2) >= 0 ) &&
+					( *yyxi != yychar ) )
+					;
+				if ( ( yy_n = yyxi[1] ) < 0 )
+					YYACCEPT;
+			}
+		}
+
+		/*
+		** check for syntax error
+		*/
+		if ( yy_n == 0 )	/* have an error */
+		{
+			/* no worry about speed here! */
+			switch ( yyerrflag )
+			{
+			case 0:		/* new error */
+				yyerror( (nl_msg(30003,"syntax error")) );
+				yynerrs++;
+				goto skip_init;
+			yyerrlab:
+				/*
+				** get globals into registers.
+				** we have a user generated syntax type error
+				*/
+				yy_pv = yypv;
+				yy_ps = yyps;
+				yy_state = yystate;
+				yynerrs++;
+			skip_init:
+			case 1:
+			case 2:		/* incompletely recovered error */
+					/* try again... */
+				yyerrflag = 3;
+				/*
+				** find state where "error" is a legal
+				** shift action
+				*/
+				while ( yy_ps >= yys )
+				{
+					yy_n = yypact[ *yy_ps ] + YYERRCODE;
+					if ( yy_n >= 0 && yy_n < YYLAST &&
+						yychk[yyact[yy_n]] == YYERRCODE)					{
+						/*
+						** simulate shift of "error"
+						*/
+						yy_state = yyact[ yy_n ];
+						goto yy_stack;
+					}
+					/*
+					** current state has no shift on
+					** "error", pop stack
+					*/
+#if YYDEBUG
+#	define _POP_ "Error recovery pops state %d, uncovers state %d\n"
+					if ( yydebug )
+						printf( _POP_, *yy_ps,
+							yy_ps[-1] );
+#	undef _POP_
+#endif
+					yy_ps--;
+					yy_pv--;
+				}
+				/*
+				** there is no state on stack with "error" as
+				** a valid shift.  give up.
+				*/
+				YYABORT;
+			case 3:		/* no shift yet; eat a token */
+#if YYDEBUG
+				/*
+				** if debugging, look up token in list of
+				** pairs.  0 and negative shouldn't occur,
+				** but since timing doesn't matter when
+				** debugging, it doesn't hurt to leave the
+				** tests here.
+				*/
+				if ( yydebug )
+				{
+					register int yy_i;
+
+					printf( "Error recovery discards " );
+					if ( yychar == 0 )
+						printf( "token end-of-file\n" );
+					else if ( yychar < 0 )
+						printf( "token -none-\n" );
+					else
+					{
+						for ( yy_i = 0;
+							yytoks[yy_i].t_val >= 0;
+							yy_i++ )
+						{
+							if ( yytoks[yy_i].t_val
+								== yychar )
+							{
+								break;
+							}
+						}
+						printf( "token %s\n",
+							yytoks[yy_i].t_name );
+					}
+				}
+#endif /* YYDEBUG */
+				if ( yychar == 0 )	/* reached EOF. quit */
+					YYABORT;
+				yychar = -1;
+				goto yy_newstate;
+			}
+		}/* end if ( yy_n == 0 ) */
+		/*
+		** reduction by production yy_n
+		** put stack tops, etc. so things right after switch
+		*/
+#if YYDEBUG
+		/*
+		** if debugging, print the string that is the user's
+		** specification of the reduction which is just about
+		** to be done.
+		*/
+		if ( yydebug )
+			printf( "Reduce by (%d) \"%s\"\n",
+				yy_n, yyreds[ yy_n ] );
+#endif
+		yytmp = yy_n;			/* value to switch over */
+		yypvt = yy_pv;			/* $vars top of value stack */
+		/*
+		** Look in goto table for next state
+		** Sorry about using yy_state here as temporary
+		** register variable, but why not, if it works...
+		** If yyr2[ yy_n ] doesn't have the low order bit
+		** set, then there is no action to be done for
+		** this reduction.  So, no saving & unsaving of
+		** registers done.  The only difference between the
+		** code just after the if and the body of the if is
+		** the goto yy_stack in the body.  This way the test
+		** can be made before the choice of what to do is needed.
+		*/
+		{
+			/* length of production doubled with extra bit */
+			register int yy_len = yyr2[ yy_n ];
+
+			if ( !( yy_len & 01 ) )
+			{
+				yy_len >>= 1;
+				yyval = ( yy_pv -= yy_len )[1];	/* $$ = $1 */
+				yy_state = yypgo[ yy_n = yyr1[ yy_n ] ] +
+					*( yy_ps -= yy_len ) + 1;
+				if ( yy_state >= YYLAST ||
+					yychk[ yy_state =
+					yyact[ yy_state ] ] != -yy_n )
+				{
+					yy_state = yyact[ yypgo[ yy_n ] ];
+				}
+				goto yy_stack;
+			}
+			yy_len >>= 1;
+			yyval = ( yy_pv -= yy_len )[1];	/* $$ = $1 */
+			yy_state = yypgo[ yy_n = yyr1[ yy_n ] ] +
+				*( yy_ps -= yy_len ) + 1;
+			if ( yy_state >= YYLAST ||
+				yychk[ yy_state = yyact[ yy_state ] ] != -yy_n )
+			{
+				yy_state = yyact[ yypgo[ yy_n ] ];
+			}
+		}
+					/* save until reenter driver code */
+		yystate = yy_state;
+		yyps = yy_ps;
+		yypv = yy_pv;
+	}
+	/*
+	** code supplied by user is placed in this switch
+	*/
+	switch( yytmp )
+	{
+		
+case 8:
+# line 103 "gram.Y"
+{ mods = 0; resetArgs(); } break;
+case 10:
+# line 105 "gram.Y"
+{ resetArgs(); } break;
+case 12:
+# line 107 "gram.Y"
+{ resetArgs(); } break;
+case 14:
+# line 109 "gram.Y"
+{ resetArgs(); } break;
+case 16:
+# line 113 "gram.Y"
+{ wmObjState = wmMapped; } break;
+case 17:
+# line 114 "gram.Y"
+{ wmObjState = wmMappedNoSpace; } break;
+case 18:
+# line 115 "gram.Y"
+{ wmObjState = wmUnmapped; } break;
+case 19:
+# line 116 "gram.Y"
+{ wmObjState = wmUnmappedNoSpace; } break;
+case 22:
+# line 123 "gram.Y"
+{ wmAddBinding(0, 0, yypvt[-0].ptr); resetArgs(); } break;
+case 23:
+# line 124 "gram.Y"
+{ wmMenuEntryDone(); resetArgs(); } break;
+case 25:
+# line 128 "gram.Y"
+{ wmAddFunction(what, argv, argc);
+					    resetArgs();
+					  } break;
+case 29:
+# line 138 "gram.Y"
+{ wmAddBinding(0, BINDINGS, yypvt[-0].ptr); wmBindingDone(); mods=0; resetArgs(); } break;
+case 30:
+# line 141 "gram.Y"
+{ wmAddBinding(mods, what, argv[0]); resetArgs(); } break;
+case 31:
+# line 142 "gram.Y"
+{ wmBindingDone(); mods=0; resetArgs(); } break;
+case 34:
+# line 149 "gram.Y"
+{ what = KEY; argv[argc++] = yypvt[-0].ptr; } break;
+case 37:
+# line 156 "gram.Y"
+{ if (argc < PARAMETERS) argv[argc++] = yypvt[-0].ptr; } break;
+case 38:
+# line 159 "gram.Y"
+{ what = Button1; mods |= Button1Mask; } break;
+case 39:
+# line 160 "gram.Y"
+{ what = Button2; mods |= Button2Mask; } break;
+case 40:
+# line 161 "gram.Y"
+{ what = Button3; mods |= Button3Mask; } break;
+case 41:
+# line 162 "gram.Y"
+{ what = Button4; mods |= Button4Mask; } break;
+case 42:
+# line 163 "gram.Y"
+{ what = Button5; mods |= Button5Mask; } break;
+case 43:
+# line 164 "gram.Y"
+{ what = BTN; } break;
+case 44:
+# line 165 "gram.Y"
+{ what = DROP; } break;
+case 45:
+# line 166 "gram.Y"
+{ what = DROP1; } break;
+case 46:
+# line 167 "gram.Y"
+{ what = DROP2; } break;
+case 47:
+# line 168 "gram.Y"
+{ what = DROP3; } break;
+case 48:
+# line 169 "gram.Y"
+{ what = DROP4; } break;
+case 49:
+# line 170 "gram.Y"
+{ what = DROP5; } break;
+case 52:
+# line 177 "gram.Y"
+{ mods |= Mod1Mask; } break;
+case 53:
+# line 178 "gram.Y"
+{ mods |= ShiftMask; } break;
+case 54:
+# line 179 "gram.Y"
+{ mods |= ControlMask; } break;
+case 56:
+# line 183 "gram.Y"
+{ wmAddFunction(what, argv, argc); resetArgs(); } break;
+case 59:
+# line 190 "gram.Y"
+{ what = F_RAISE; } break;
+case 60:
+# line 191 "gram.Y"
+{ what = F_LOWER; } break;
+case 61:
+# line 192 "gram.Y"
+{ what = F_ICONIFY; } break;
+case 62:
+# line 193 "gram.Y"
+{ what = F_DEICONIFY; } break;
+case 63:
+# line 194 "gram.Y"
+{ what = F_RESTART; } break;
+case 64:
+# line 195 "gram.Y"
+{ what = F_QUIT; } break;
+case 65:
+# line 196 "gram.Y"
+{ what = F_MOVE; } break;
+case 66:
+# line 197 "gram.Y"
+{ what = F_FORCEMOVE; } break;
+case 67:
+# line 198 "gram.Y"
+{ what = F_MOVEOPAQUE; } break;
+case 68:
+# line 199 "gram.Y"
+{ what = F_RESIZE; } break;
+case 69:
+# line 200 "gram.Y"
+{ what = F_GROUP; } break;
+case 70:
+# line 201 "gram.Y"
+{ what = F_UNGROUP; } break;
+case 71:
+# line 202 "gram.Y"
+{ what = F_REGROUP; } break;
+case 72:
+# line 203 "gram.Y"
+{ what = F_BEEP; } break;
+case 73:
+# line 204 "gram.Y"
+{ what = F_CIRCLEDOWN; } break;
+case 74:
+# line 205 "gram.Y"
+{ what = F_CIRCLEUP; } break;
+case 75:
+# line 206 "gram.Y"
+{ what = F_DESTROY; } break;
+case 76:
+# line 207 "gram.Y"
+{ what = F_EXEC; } break;
+case 77:
+# line 208 "gram.Y"
+{ what = F_FOCUS; } break;
+case 78:
+# line 209 "gram.Y"
+{ what = F_IDENTIFY; } break;
+case 79:
+# line 210 "gram.Y"
+{ what = F_NOP; } break;
+case 80:
+# line 211 "gram.Y"
+{ what = F_RAISELOWER; } break;
+case 81:
+# line 212 "gram.Y"
+{ what = F_REFRESH; } break;
+case 82:
+# line 213 "gram.Y"
+{ what = F_UNFOCUS; } break;
+case 83:
+# line 214 "gram.Y"
+{ what = F_WINREFRESH; } break;
+case 84:
+# line 215 "gram.Y"
+{ what = F_WARPTO; } break;
+case 85:
+# line 216 "gram.Y"
+{ what = F_MENU; } break;
+case 86:
+# line 217 "gram.Y"
+{ what = F_TITLE; } break;
+case 87:
+# line 218 "gram.Y"
+{ what = F_TITLEPIN; } break;
+case 88:
+# line 219 "gram.Y"
+{ what = F_STOP; } break;
+case 89:
+# line 220 "gram.Y"
+{ what = F_PACK; } break;
+case 90:
+# line 221 "gram.Y"
+{ what = F_SQUEEZE; } break;
+case 91:
+# line 222 "gram.Y"
+{ what = F_KILL; } break;
+case 92:
+# line 223 "gram.Y"
+{ what = F_SHUTDOWN; } break;
+case 93:
+# line 224 "gram.Y"
+{ what = F_DELETE; } break;
+case 94:
+# line 225 "gram.Y"
+{ what = F_MAP; } break;
+case 95:
+# line 226 "gram.Y"
+{ what = F_UNMAP; } break;
+case 96:
+# line 227 "gram.Y"
+{ what = F_MACRO; } break;
+case 97:
+# line 228 "gram.Y"
+{ what = F_STRING; } break;
+case 98:
+# line 229 "gram.Y"
+{ what = F_ZOOM; } break;
+case 99:
+# line 230 "gram.Y"
+{ what = F_HORIZOOM; } break;
+case 100:
+# line 231 "gram.Y"
+{ what = F_VERTZOOM; } break;
+case 101:
+# line 232 "gram.Y"
+{ what = F_SAVE; } break;
+case 102:
+# line 233 "gram.Y"
+{ what = F_RESTORE; } break;
+case 103:
+# line 234 "gram.Y"
+{ what = F_SAVEPOINTER; } break;
+case 104:
+# line 235 "gram.Y"
+{ what = F_RESTOREPOINTER; } break;
+case 105:
+# line 236 "gram.Y"
+{ what = F_WARPHORIZONTAL; } break;
+case 106:
+# line 237 "gram.Y"
+{ what = F_WARPVERTICAL; } break;
+case 107:
+# line 238 "gram.Y"
+{ what = F_WARPTOSCREEN; } break;
+case 108:
+# line 239 "gram.Y"
+{ what = F_PANNER; } break;
+case 109:
+# line 240 "gram.Y"
+{ what = F_SCROLLLEFT; } break;
+case 110:
+# line 241 "gram.Y"
+{ what = F_SCROLLRIGHT; } break;
+case 111:
+# line 242 "gram.Y"
+{ what = F_SCROLLUP; } break;
+case 112:
+# line 243 "gram.Y"
+{ what = F_SCROLLDOWN; } break;
+case 113:
+# line 244 "gram.Y"
+{ what = F_STICK; } break;
+case 114:
+# line 245 "gram.Y"
+{ what = F_UNSTICK; } break;
+case 115:
+# line 246 "gram.Y"
+{ what = F_SCROLLHOME; } break;
+case 116:
+# line 247 "gram.Y"
+{ what = F_FALSESTOP; } break;
+case 117:
+# line 248 "gram.Y"
+{ what = F_SCROLL; } break;
+case 118:
+# line 249 "gram.Y"
+{ what = F_RECONFIG; } break;
+case 119:
+# line 250 "gram.Y"
+{ what = F_GETRESOURCE; } break;
+case 120:
+# line 251 "gram.Y"
+{ what = F_PIN; } break;
+case 121:
+# line 252 "gram.Y"
+{ what = F_UNPIN; } break;
+case 122:
+# line 253 "gram.Y"
+{ what = F_QUERY; } break;
+case 123:
+# line 254 "gram.Y"
+{ what = F_SCROLLTO; } break;
+case 124:
+# line 255 "gram.Y"
+{ what = F_SAVEVROOT; } break;
+case 125:
+# line 256 "gram.Y"
+{ what = F_RESTOREVROOT; } break;
+case 126:
+# line 257 "gram.Y"
+{ what = F_WARPSAVE; } break;
+case 127:
+# line 258 "gram.Y"
+{ what = F_SCROLLSAVE; } break;
+case 128:
+# line 259 "gram.Y"
+{ what = F_PLACES; } break;
+case 129:
+# line 260 "gram.Y"
+{ what = F_CONSTRAINMOVE; } break;
+case 130:
+# line 261 "gram.Y"
+{ what = F_REBIND; } break;
+case 131:
+# line 262 "gram.Y"
+{ what = F_NEWBUTTONIMAGE; } break;
+case 132:
+# line 263 "gram.Y"
+{ what = F_ANIMATEBUTTON; } break;
+case 133:
+# line 264 "gram.Y"
+{ what = F_DUMP; } break;
+case 134:
+# line 265 "gram.Y"
+{ what = F_AUTORESIZE; } break;
+case 135:
+# line 266 "gram.Y"
+{ what = F_SWEEP; } break;
+case 136:
+# line 267 "gram.Y"
+{ what = F_UNSWEEP; } break;
+case 137:
+# line 268 "gram.Y"
+{ what = F_HARDRESTART; } break;
+case 138:
+# line 269 "gram.Y"
+{ what = F_HANDLEDROP; } break;
+case 139:
+# line 270 "gram.Y"
+{ what = F_ROUNDUP; } break;
+case 140:
+# line 271 "gram.Y"
+{ what = F_SETDESKTOP; } break;
+case 141:
+# line 272 "gram.Y"
+{ what = F_FREEZEDESKTOP; } break;
+case 142:
+# line 273 "gram.Y"
+{ what = F_THAWDESKTOP; } break;
+case 143:
+# line 274 "gram.Y"
+{ what = F_GRAVITY; } break;
+case 144:
+# line 275 "gram.Y"
+{ what = F_RESHUFFLE; } break;
+case 145:
+# line 276 "gram.Y"
+{ what = F_INFO; } break;
+case 146:
+# line 277 "gram.Y"
+{ what = F_OWNER; } break;
+case 147:
+# line 278 "gram.Y"
+{ what = F_FOCUSCOLOR; } break;
+case 148:
+# line 279 "gram.Y"
+{ what = F_TERMINALPLACES; } break;
+case 151:
+# line 286 "gram.Y"
+{
+					char *p;
+					geom.x = geom.y = 0;
+					geom.width = geom.height = 1;
+					geom.sign_x = geom.sign_y = 1;
+					geom.center = False;
+					if (!(p = strchr(yypvt[-0].ptr, 'c')))
+					    p = strchr(yypvt[-0].ptr, 'C');
+					if (p)
+					{
+					    *p = '0';
+					    geom.center = True;
+					}
+					else
+					    geom.center = False;
+					mask = XParseGeometry(yypvt[-0].ptr,
+					    &geom.x, &geom.y,
+					    &geom.width, &geom.height);
+					if (mask & XNegative)
+					{
+					    geom.x *= -1;
+					    geom.sign_x = -1;
+					}
+					if (mask & YNegative)
+					{
+					    geom.y *= -1;
+					    geom.sign_y = -1;
+					}
+					free((char*)yypvt[-0].ptr);
+					wmPanelKidsList.append((ent)
+					    new wmPanelKid(yypvt[-2].num, yypvt[-1].ptr ,&geom));
+				    } break;
+case 154:
+# line 324 "gram.Y"
+{
+					geom.x = geom.y = 0;
+					geom.width = geom.height = 1;
+					geom.sign_x = geom.sign_y = 1;
+					geom.center = False;
+					mask = XParseGeometry(yypvt[-0].ptr,
+					    &geom.x, &geom.y,
+					    &geom.width, &geom.height);
+					if (mask & XNegative)
+					{
+					    geom.x *= -1;
+					    geom.sign_x = -1;
+					}
+					if (mask & YNegative)
+					{
+					    geom.y *= -1;
+					    geom.sign_y = -1;
+					}
+					free((char*)yypvt[-0].ptr);
+					wmRegionKidsList.append((ent)
+					    new wmRegionKid(yypvt[-2].ptr, yypvt[-1].ptr ,&geom));
+				    } break;
+case 155:
+# line 348 "gram.Y"
+{ yyval.num = OBJ_PANEL; } break;
+case 156:
+# line 349 "gram.Y"
+{ yyval.num = OBJ_BUTTON; } break;
+case 157:
+# line 350 "gram.Y"
+{ yyval.num = OBJ_TEXT; } break;
+case 158:
+# line 351 "gram.Y"
+{ yyval.num = OBJ_MENU; } break;
+case 159:
+# line 352 "gram.Y"
+{ yyval.num = OBJ_MENUBAR; } break;
+case 161:
+# line 356 "gram.Y"
+{ wmStringList.append((ent)yypvt[-0].ptr); } break;
+case 162:
+# line 359 "gram.Y"
+{ yyval.ptr = yypvt[-0].ptr; } break;
+	}
+	goto yystack;		/* reset registers in driver code */
+}
+
+# ifdef __RUNTIME_YYMAXDEPTH
+
+static int allocate_stacks() {
+	/* allocate the yys and yyv stacks */
+	yys = (int *) malloc(yymaxdepth * sizeof(int));
+	yyv = (YYSTYPE *) malloc(yymaxdepth * sizeof(YYSTYPE));
+
+	if (yys==0 || yyv==0) {
+	   yyerror( (nl_msg(30004,"unable to allocate space for yacc stacks")) );
+	   return(1);
+	   }
+	else return(0);
+
+}
+
+
+static void free_stacks() {
+	if (yys!=0) free((char*)(char *) yys);
+	if (yyv!=0) free((char*)(char *) yyv);
+}
+
+# endif  /* defined(__RUNTIME_YYMAXDEPTH) */
+

@@ -1,0 +1,24 @@
+include ../config.mk
+
+SRCS = swmcmd.c
+OBJS = swmcmd.o
+PROGRAM = swmcmd
+
+all: $(PROGRAM)
+
+$(PROGRAM): $(OBJS)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS) $(XLIBS)
+
+clean: 
+	-$(RM) $(PROGRAM)
+
+clobber: clean
+	-$(RM) $(OBJS)
+
+depend:
+	$(DEPEND) -s "# DO NOT DELETE"  -- $(DEFINES) $(DEPINCLUDES) -- $(SRCS)
+
+install:
+	-if [ ! -d $(BINDIR) ] ; then \
+		$(MKDIR) $(BINDIR); fi
+	$(INSTALL) $(INSTBINFLAGS) $(PROGRAM) $(BINDIR)

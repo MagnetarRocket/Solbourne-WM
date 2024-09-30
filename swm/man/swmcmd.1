@@ -1,0 +1,44 @@
+.TH SWMCMD 1 "31 July 1990" 
+.sp 
+.SH NAME
+\f3swmcmd\f1 \(em Execute swm command
+.sp 
+.SH SYNOPSIS 
+.PP 
+\f3swmcmd\f1 \f2function\f1
+.sp 
+.SH DESCRIPTION 
+.PP
+This command is used only in conjunction with the \f3swm\f1\|(1)
+window manager under the X Window System.  It executes one or
+more of the built-in \f3swm\f1 functions.
+.PP 
+Supply as an argument the name of an swm function to execute,
+or a series of functions enclosed in quotes.  
+If the swm function requires an argument, place it in parentheses
+after the function, but protect the parentheses by placing 
+the command in quotes. If the swm function requires a client argument 
+it may be omitted, in which case the user will select the client
+interactively.
+.sp
+.SH EXAMPLES
+.PP
+\f(CWswmcmd f.iconify
+.br
+swmcmd 'f.move f.raise'
+.br
+swmcmd 'f.warphorizontal(100)'\f1
+.sp
+.SH SEE ALSO
+.PP
+\f3swm\f1\|(1), \f3X\f1\|(1)
+.\"\f2swm User's Guide\f1
+.sp
+.SH COPYRIGHT
+.PP
+Copyright \(co, ParcPlace Systems, Inc.
+.sp
+.SH AUTHOR
+.PP
+Tom LaStrange, ParcPlace Systems, Inc.
+

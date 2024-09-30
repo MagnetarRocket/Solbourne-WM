@@ -1,0 +1,53 @@
+#**********************************************************************
+#
+#  Install swm configuration files
+#
+#**********************************************************************
+
+SWMLIB= $(LIBDIR)/swm
+
+SRCS =\
+	OpenLook10 OpenLook12 OpenLook14 OpenLook.com \
+	OLpulldown10.xbm OLpulldown12.xbm OLpulldown14.xbm \
+	OLpull10.xbm OLpull12.xbm OLpull14.xbm \
+	OpenLook+ OLpinIn.xbm OLpinOut.xbm \
+	NailIn.xbm NailOut.xbm Default \
+	Mmax14.xbm Mmenu14.xbm Mmin14.xbm \
+	twm Ticon.xbm Tresize.xbm \
+	mwm mwm.com mwm+ Mwmmax.xbm Mwmmenu.xbm Mwmmin.xbm MnailIn.xbm \
+	MnailInBT.xbm MnailInTB.xbm MnailOut.xbm MnailOutBT.xbm MnailOutTB.xbm \
+	MmaxBT.xbm MmaxTB.xbm MmenuBT.xbm MmenuTB.xbm MminBT.xbm MminTB.xbm \
+	OpenLook3d+ \
+	NailInBT.xbm NailInTB.xbm NailInbb.xbm NailOutBT.xbm \
+	NailOutTB.xbm NailOutbb.xbm OLpinInBT.xbm OLpinInTB.xbm \
+	OLpinOutBT.xbm OLpinOutTB.xbm OLpullBB.xbm OLpullBT.xbm \
+	OLpullDD.xbm OLpullTB.xbm OLpullTT.xbm OLpullbD.xbm \
+	OLpullbb.xbm \
+	vdt.c
+
+all::
+
+MakeDirectories(install, $(SWMLIB))
+InstallMultipleDestFlags(install, $(SRCS), $(SWMLIB), $(INSTDATFLAGS))
+
+SWMSRCCONF = $(SWMSRCDIR)/config
+CONFIG_MK = config.mk
+
+install_src:: $(CONFIG_MK)
+
+$(CONFIG_MK):
+	@echo "Making $(CONFIG_MK)"
+	@echo -n "FILES = " 					>  $(CONFIG_MK)
+	@for i in $(SRCS) ;\
+	do \
+	echo '	\'						>> $(CONFIG_MK); \
+	echo -n "	$$i" 					>> $(CONFIG_MK); \
+	done
+	@echo 							 >> $(CONFIG_MK);
+
+MakeDirectories(install_src, $(SWMSRCCONF))
+InstallMultipleDestFlags(install_src, $(SRCS) $(CONFIG_MK), $(SWMSRCCONF), $(INSTDATFLAGS))
+InstallMultipleDestFlags(install_src, makefile.site, $(SWMSRCCONF)/Makefile, $(INSTDATFLAGS))
+
+depend::
+	@echo "skipping make depend in swm/config"

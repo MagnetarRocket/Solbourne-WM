@@ -1,0 +1,452 @@
+!**********************************************************************
+!
+!    Swm template for swm custom that includes
+!	an Open Look type frame with a pushpin
+!	for the virtual root
+!
+!    Author: Tom LaStrange
+!    Date:   09/13/89
+!    $Id: OpenLook+,v 9.14 1991/05/03 06:41:47 kelly Exp $
+!
+!**********************************************************************
+
+Swm*model: OpenLook
+Swm*virtualDesktop: 4608x3600
+Swm*virtualDesktop.scrollBars: False
+Swm*virtualDesktop.panner.scale: 25
+Swm*virtualDesktop.panner.geometry: -0-0
+Swm*virtualDesktop.panner.initialState: NormalState
+
+Swm*font: -adobe-courier-medium-r-normal--12-120-75-75-m-70-iso8859-1
+Swm*button.name.font: -adobe-courier-bold-r-normal--12-120-75-75-m-70-iso8859-1
+Swm*button.pullDown: @OLpull12.xbm
+Swm*panel.openLook*resizeWidth: 4
+Swm*panel.openLook*resizeLength: 10
+
+!change some of the default cursors to something else
+Swm*moveCursor:		top_left_arrow
+Swm*resizeCursor:	top_left_arrow
+
+! OpenLook only wants to see the outline of the window
+Swm*resizeGrid:	False
+
+! icon gravity, icons tile top-right to bottom-right
+Swm*iconGravity:	NorthEast
+
+! What the mouse buttons do on the root window
+Swm*root.bindings: \
+	<Btn1>		:	f.menu(functions)	\
+	<Btn3>		:	f.menu(workspace)	\
+	<Key>Up		:	f.scrollup		\
+	<Key>Down	:	f.scrolldown		\
+	<Key>Left	:	f.scrollleft		\
+	<Key>Right	:	f.scrollright		\
+Meta	<Key>Up		:	f.scrollup		\
+Meta	<Key>Down	:	f.scrolldown		\
+Meta	<Key>Left	:	f.scrollleft		\
+Meta	<Key>Right	:	f.scrollright		\
+Shift	<Key>Up		:	f.scrollup(2)		\
+Shift	<Key>Down	:	f.scrolldown(2)		\
+Shift	<Key>Left	:	f.scrollleft(2)		\
+Shift	<Key>Right	:	f.scrollright(2)	\
+
+Swm*button.pin: @OLpinOut.xbm
+Swm*pinIn*button.pin: @OLpinIn.xbm
+Swm*button.nail: @NailOut.xbm
+Swm*sticky*button.nail: @NailIn.xbm
+
+Swm*panel.openLook*button.pin.bindings: \
+    bindings pin
+Swm*olmenu.limited*panel.openLook*button.pin.bindings: \
+    bindings pin
+Swm*olmenu.none*panel.openLook*button.pin.bindings: \
+    bindings pin
+Swm*pinIn*panel.openLook*button.pin.bindings: \
+    bindings unpin
+Swm*olmenu.limited*pinIn*panel.openLook*button.pin.bindings: \
+    bindings unpin
+Swm*olmenu.none*pinIn*panel.openLook*button.pin.bindings: \
+    bindings unpin
+
+Swm*bindings.pin: \
+    <Btn> : f.ungroup f.pin f.newbuttonimage(pin, @OLpinIn.xbm) f.rebind(pin, unpin) f.regroup
+
+Swm*bindings.unpin: \
+    <Btn> : f.ungroup f.unpin f.newbuttonimage(pin, @OLpinOut.xbm) f.rebind(pin, pin) f.regroup
+
+Swm*panel.openLook*button.nail.bindings: \
+	bindings stickit
+Swm*sticky*panel.openLook*button.nail.bindings: \
+	bindings unstickit
+Swm*olmenu.limited*panel.openLook*button.nail.bindings: \
+	bindings stickit
+Swm*olmenu.limited*sticky*panel.openLook*button.nail.bindings: \
+	bindings unstickit
+Swm*olmenu.none*panel.openLook*button.nail.bindings: \
+	bindings stickit
+Swm*olmenu.none*sticky*panel.openLook*button.nail.bindings: \
+	bindings unstickit
+
+Swm*bindings.stickit: \
+	<Btn> : f.stick   f.falsestop f.newbuttonimage(nail, @NailIn.xbm) f.rebind(nail, unstickit)
+Swm*bindings.unstickit: \
+	<Btn> : f.unstick f.falsestop f.newbuttonimage(nail, @NailOut.xbm) f.rebind(nail, stickit)
+
+Swm*decoration: openLook
+Swm*panel.openLook: \
+	button	pullDown	+0+0	\
+	button	name		+c+0	\
+	button	nail		-0+0	\
+	panel	client	+0+1
+
+! Here come the 16 different open look decoration 
+! panels.  The bits are specified like this:
+!
+!     3         2        1         0
+! OL_RESIZE  OL_PIN  OL_CLOSE  OL_HEADER
+
+Swm*openLook.0*decoration: openLook.0
+Swm*panel.openLook.0: \
+	panel	client	+0+1
+Swm*panel.openLook.0.pad: 4
+
+Swm*openLook.1*decoration: openLook.1
+Swm*panel.openLook.1: \
+	button	nail		-0+0	\
+	button	name		+c+0	\
+	panel	client		+0+1
+
+Swm*openLook.2*decoration: openLook.2
+Swm*panel.openLook.2: \
+	button	nail		-0+0	\
+	button	pullDown	+0+0	\
+	panel	client		+0+1
+
+Swm*openLook.3*decoration: openLook.3
+Swm*panel.openLook.3: \
+	button	nail		-0+0	\
+	button	pullDown	+0+0	\
+	button	name		+c+0	\
+	panel	client		+0+1
+
+Swm*openLook.4*decoration: openLook.4
+Swm*panel.openLook.4: \
+	button	nail		-0+0	\
+	button	pin		+0+0	\
+	panel	client		+0+1
+
+Swm*openLook.5*decoration: openLook.5
+Swm*panel.openLook.5: \
+	button	nail		-0+0	\
+	button	pin		+0+0	\
+	button	name		+c+0	\
+	panel	client		+0+1
+
+Swm*openLook.6*decoration: openLook.2
+
+Swm*openLook.7*decoration: openLook.3
+
+Swm*openLook.8*decoration: openLook.8
+Swm*panel.openLook.8: \
+	panel	client		+0+1
+
+Swm*openLook.9*decoration: openLook.9
+Swm*panel.openLook.9: \
+	button	nail		-0+0	\
+	button	name		+c+0	\
+	panel	client		+0+1
+
+Swm*openLook.10*decoration: openLook.10
+Swm*panel.openLook.10: \
+	button	nail		-0+0	\
+	button	pullDown	+0+0	\
+	panel	client		+0+1
+
+Swm*openLook.11*decoration: openLook.11
+Swm*panel.openLook.11: \
+	button	nail		-0+0	\
+	button	pullDown	+0+0	\
+	button	name		+c+0	\
+	panel	client		+0+1
+
+Swm*openLook.12*decoration: openLook.12
+Swm*panel.openLook.12: \
+	button	nail		-0+0	\
+	button	pin		+0+0	\
+	panel	client		+0+1
+
+Swm*openLook.13*decoration: openLook.13
+Swm*panel.openLook.13: \
+	button	nail		-0+0	\
+	button	pin		+0+0	\
+	button	name		+c+0	\
+	panel	client		+0+1
+
+Swm*openLook.14*decoration: openLook.14
+Swm*panel.openLook.14: \
+	button	nail		-0+0	\
+	button	pullDown	+0+0	\
+	panel	client		+0+1
+
+Swm*openLook.15*decoration: openLook.15
+Swm*panel.openLook.15: \
+	button	nail		-0+0	\
+	button	pullDown	+0+0	\
+	button	name		+c+0	\
+	panel	client		+0+1
+
+Swm*panel.openLook.8.resizeCorners: True
+Swm*panel.openLook.9.resizeCorners: True
+Swm*panel.openLook.10.resizeCorners: True
+Swm*panel.openLook.11.resizeCorners: True
+Swm*panel.openLook.12.resizeCorners: True
+Swm*panel.openLook.13.resizeCorners: True
+Swm*panel.openLook.14.resizeCorners: True
+Swm*panel.openLook.15.resizeCorners: True
+
+! transient window decoration
+Swm*transient*decoration: openLook.1
+
+! turn on the resize corners
+Swm*panel.openLook.resizeCorners: True
+Swm*panel.openLook*borderWidth: 1
+Swm*panel.openLook*button*borderWidth: 0
+Swm*panel.openLook*panel*borderWidth: 0
+Swm*panel.openLook*insideBorderWidth: 1
+
+! bindings for the title bar and surrounding frame
+Swm*panel.openLook*bindings: \
+	bindings		unzoomed
+
+Swm*bindings.unzoomed: \
+	bindings		standard		\
+	<Btn3>		:	f.menu(menuFull1)
+
+Swm*bindings.zoomed: \
+	bindings		standard		\
+	<Btn3>		:	f.menu(menuFull2)
+
+Swm*bindings.standard: \
+	<Btn1>		:	f.move f.stop f.raise		\
+	bindings		standardClient
+
+Swm*bindings.standardClient: \
+	<Key>F1		:	f.raise			\
+	<Key>F2		:	f.lower			\
+	<Key>L1		:	f.iconify		\
+Meta	<Key>Up		:	f.scrollup		\
+Meta	<Key>Down	:	f.scrolldown		\
+Meta	<Key>Left	:	f.scrollleft		\
+Meta	<Key>Right	:	f.scrollright		\
+Shift	<Key>Up		:	f.scrollup(2)		\
+Shift	<Key>Down	:	f.scrolldown(2)		\
+Shift	<Key>Left	:	f.scrollleft(2)		\
+Shift	<Key>Right	:	f.scrollright(2)	\
+
+Swm*olmenu.limited*panel.openLook*bindings: \
+	bindings		standard		\
+	<Btn3>		:	f.menu(menuLimited)	\
+
+Swm*olmenu.none*panel.openLook*bindings: \
+	bindings		standard
+
+Swm*panel.openLook*button.name.bindings:
+Swm*olmenu.limited*panel.openLook*button.name.bindings:
+Swm*olmenu.none*panel.openLook*button.name.bindings:
+
+! What the mouse buttons do in client windows
+Swm*panel.openLook*panel.client.bindings: \
+	bindings		standardClient
+
+Swm*olmenu.limited*panel.openLook*panel.client.bindings: \
+	bindings		standardClient
+
+Swm*olmenu.none*panel.openLook*panel.client.bindings: \
+	bindings		standardClient
+
+! center the name in the title bar
+Swm*button.name.gravity: Center
+Swm*button.name.state: MappedNoSpace
+
+! pulldown button when the window is not zoomed
+Swm*panel.openLook*button.pullDown.bindings: bindings	pullUnzoomed
+
+Swm*bindings.pullUnzoomed: \
+    <Btn1> : f.iconify \
+    <Btn3> : f.menu(menuFull1)
+
+Swm*bindings.pullZoomed: \
+    <Btn1> : f.iconify \
+    <Btn3> : f.menu(menuFull2)
+
+Swm*olmenu.limited*panel.openLook*button.pullDown.bindings: \
+    <Btn1> : f.iconify \
+    <Btn3> : f.menu(menuLimited)
+
+! Limited
+Swm*menu.menuLimited: \
+    Window		f.title \
+    "Dismiss/Cancel"	f.delete \
+    Back		f.lower \
+    Refresh		f.winrefresh \
+    "Owner?"		f.owner
+
+! non zoomed window menu
+Swm*menu.menuFull1: \
+    Window		f.title \
+    Close		f.iconify \
+    "Full Size"		f.raise f.save f.zoom f.rebind(pullDown, pullZoomed) f.rebind(openLook, zoomed) \
+    "Properties..."	f.nop \
+    Back		f.lower \
+    Refresh		f.winrefresh \
+    Quit		f.delete
+
+! zoomed window menu
+Swm*menu.menuFull2: \
+    Window		f.title \
+    Close		f.iconify \
+    "Restore Size"	f.restore f.rebind(pullDown, pullUnzoomed) f.rebind(openLook, unzoomed) \
+    "Properties..."	f.nop \
+    Back		f.lower \
+    Refresh		f.winrefresh \
+    Quit		f.delete
+
+! the default icon
+Swm*icon: Xicon
+Swm*panel.Xicon: \
+    button iconImage	+c+0 \
+    button iconName	+c+1
+Swm*defaultIconImage: @xlogo32
+
+Swm*panel.Xicon.borderWidth: 1
+Swm*panel.Xicon*bindings: \
+    <Btn1>2 : f.deiconify f.raise \
+    <Btn1> : f.move f.stop f.raise \
+    <Btn3> : f.menu(iconMenu)
+
+! the icon menu
+Swm*menu.iconMenu: \
+    Window		f.title \
+    Open		f.deiconify f.raise \
+    "Full Size"		f.map(pullDown2) f.raise f.save f.zoom f.deiconify \
+    "Properties..."	f.nop \
+    Back		f.lower \
+    Refresh		f.winrefresh \
+    Quit		f.delete
+
+! the workspace (root window) menu
+Swm*menu.workspace: \
+    Workspace		f.titlepin \
+    Programs		f.menu(programs) \
+    Utilities		f.menu(utilities) \
+    "Properties..."	f.nop \
+    Restart		f.restart \
+    Exit		f.quit \
+
+Swm*menu.programs: \
+    xterm		f.exec("xterm&") \
+    xclock		f.exec("xclock&")
+
+Swm*menu.utilities: \
+    Refresh		f.refresh \
+    "Window Controls..."	f.nop \
+    "Clipboard..."	f.nop \
+    "Print Screen"	f.nop
+
+Swm*menu.functions: \
+"swm Functions"	f.title			\
+"a - l"		f.menu(AtoL)		\
+"m - r"		f.menu(MtoR)		\
+"s - z"		f.menu(StoZ)		\
+
+Swm*menu*AtoL:					\
+"Functions A-L"		f.title			\
+"f.autoresize"		f.autoresize		\
+"f.beep"		f.beep			\
+"f.circledown"		f.circledown		\
+"f.circleup"		f.circleup		\
+"f.constrainmove"	f.constrainmove		\
+"f.deiconify"		f.deiconify		\
+"f.delete"		f.delete		\
+"f.destroy"		f.destroy		\
+"f.dump"		f.dump			\
+"f.exec"		f.exec			\
+"f.falsestop"		f.falsestop		\
+"f.focus"		f.focus			\
+"f.focuscolor"		f.focuscolor		\
+"f.forcemove"		f.forcemove		\
+"f.freezedesktop"	f.freezedesktop		\
+"f.gravity"		f.gravity		\
+"f.group"		f.group			\
+"f.hardrestart"		f.hardrestart		\
+"f.horizoom"		f.horizoom		\
+"f.iconify"		f.iconify		\
+"f.info"		f.info			\
+"f.kill"		f.kill			\
+"f.lower"		f.lower
+
+Swm*menu*MtoR:					\
+"Functions M-R"		f.title			\
+"f.macro"		f.macro			\
+"f.map"			f.map			\
+"f.menu"		f.menu			\
+"f.move"		f.move			\
+"f.moveopaque"		f.moveopaque		\
+"f.newbuttonimage"	f.newbuttonimage	\
+"f.nop"			f.nop			\
+"f.owner"		f.owner			\
+"f.pack"		f.pack			\
+"f.panner"		f.panner		\
+"f.pin"			f.pin			\
+"f.places"		f.places		\
+"f.query"		f.query			\
+"f.quit"		f.quit			\
+"f.raise"		f.raise			\
+"f.raiselower"		f.raiselower		\
+"f.rebind"		f.rebind		\
+"f.refresh"		f.refresh		\
+"f.regroup"		f.regroup		\
+"f.reshuffle"		f.reshuffle		\
+"f.resize"		f.resize		\
+"f.restart"		f.restart		\
+"f.restore"		f.restore		\
+"f.restorepointer"	f.restorepointer	\
+"f.restorevdt"		f.restorevdt		\
+"f.roundup"		f.roundup
+
+Swm*menu*StoZ:					\
+"Functions S-Z"		f.title			\
+"f.save"		f.save			\
+"f.savepointer"		f.savepointer		\
+"f.savevdt"		f.savevdt		\
+"f.scroll"		f.scroll		\
+"f.scrolldown"		f.scrolldown		\
+"f.scrollhome"		f.scrollhome		\
+"f.scrollleft"		f.scrollleft		\
+"f.scrollright"		f.scrollright		\
+"f.scrollsave"		f.scrollsave		\
+"f.scrollto"		f.scrollto		\
+"f.scrollup"		f.scrollup		\
+"f.setdesktop"		f.setdesktop		\
+"f.shutdown"		f.shutdown		\
+"f.squeeze"		f.squeeze		\
+"f.stick"		f.stick			\
+"f.stop"		f.stop			\
+"f.sweep"		f.sweep			\
+"f.thawdesktop"		f.thawdesktop		\
+"f.title"		f.title			\
+"f.titlepin"		f.titlepin		\
+"f.unfocus"		f.unfocus		\
+"f.ungroup"		f.ungroup		\
+"f.unmap"		f.unmap			\
+"f.unpin"		f.unpin			\
+"f.unstick"		f.unstick		\
+"f.unsweep"		f.unsweep		\
+"f.vertzoom"		f.vertzoom		\
+"f.warphorizontal"	f.warphorizontal	\
+"f.warpsave"		f.warpsave		\
+"f.warpto"		f.warpto		\
+"f.warptoscreen"	f.warptoscreen		\
+"f.warpvertical"	f.warpvertical		\
+"f.winrefresh"		f.winrefresh		\
+"f.zoom"		f.zoom

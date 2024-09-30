@@ -1,0 +1,194 @@
+!**********************************************************************
+!
+!    Swm template for uwm 
+!
+!    Author: George Kakatsakis 
+!    Date:   07/07/89
+!    $Id: uwm,v 9.1 1990/05/31 07:53:44 toml Exp $
+!
+!**********************************************************************
+
+
+! default decorations will be "uwm" for all windows
+Swm*decoration:uwm
+
+! black title bar
+Swm*panel.uwm*foreground:white
+Swm*panel.uwm*background:black
+Swm*button.iconify:@uwm_close_box_black.xbm
+
+! white title bar
+!Swm*panel.uwm.foreground:black
+!Swm*panel.uwm.background:white
+!Swm*button.iconify:@uwm_close_box_white.xbm
+
+!2 pixel border width around clients
+Swm*panel.uwm.borderWidth:2
+
+! button press on iconfy button (close box)
+Swm*iconify.bindings:\
+	<Btn1>:f.iconify \n\
+	Shift <Btn1>:f.delete f.beep\n\
+	
+! panel set up for uwm specific buttons, title bar etc
+Swm*panel.uwm:\
+	button iconify +0+0\
+	button name +1+0\
+	panel client +0+1\
+	button resize -0+1\
+
+! bindings for the static text title
+! this could have been an entry field allowing the user to 
+! type into it
+Swm*button.name.bindings:\
+	<Btn1>:f.move f.raise\n\
+	<Btn2>:f.resize \n\
+	<Btn3>:f.menu (uwm_menu) \n\
+	<Key>L1:f.raise\n\
+	<Key>L2:f.lower\n\
+	<Key>L3:f.iconify f.stop f.deiconify\n\
+
+Swm*button.name.state: MappedNoSpace
+
+! put a border on it
+Swm*client.borderWidth:1
+
+! normal uwm key bindings for client (inner area)
+Swm*panel.client.bindings:\
+	<Key>L1:f.raise\n\
+	<Key>L2:f.lower\n\
+	<Key>L3:f.iconify f.stop f.deiconify \n
+
+! 		if a different menu or the same menu is desired here 
+!		(the old uwm context stuff) we could set it up here
+!	<Btn2>:f.menu (uwm_menu) \n  
+
+! normal uwm key bindings for decoration around client 
+Swm*panel.uwm.bindings:\
+	<Btn1>:f.move f.raise\n\
+	<Btn2>:f.resize \n\
+	<Btn3>:f.menu (uwm_menu) \n\
+	<Key>L1:f.raise\n\
+	<Key>L2:f.lower\n\
+	<Key>L3:f.iconify f.stop f.deiconify\n\
+
+! uwm resize button icon and configuration
+Swm*button.resize:@uwm_resize_box.xbm
+Swm*button.resize.state:MappedNoSpace
+Swm*button.resize.gravity:south
+Swm*panel.uwm.button.resize.foreground:black
+Swm*panel.uwm.button.resize.background:white
+
+
+! button bindings for the resize icon (lower right corner)
+Swm*button.resize.bindings:\
+	<Btn1>:f.resize \n\
+	<Btn3>:f.menu (uwm_menu) \n
+
+! a generic icon for xterms -- could do the fancy stuff i used to do based on xterm -n 
+Swm*XTerm*icon:xtermIcon
+Swm*xtermIcon.borderWidth:2
+
+! the actual xterm icon
+Swm*button.xterm_bitmap:@uwm_xterm.xbm
+
+! xterm icon layout the bitmap and the name
+Swm*panel.xtermIcon:\
+	button xterm_bitmap +C+0\
+	button iconName	    +C+1\
+
+! bindings for xtermIcon
+Swm*panel.xtermIcon.bindings:\
+	<Btn1>:f.move f.raise \n\
+	<Btn2>:f.deiconify f.stop f.iconify\n\
+	<Btn3>:f.menu (uwm_menu) \n\
+	<Key>L1:f.raise\n\
+	<Key>L2:f.lower\n\
+	<Key>L3:f.deiconify f.stop f.iconify\n\
+
+! bindings for static text icon name
+Swm*iconName.bindings:\
+	<Btn1>:f.move f.raise \n\
+	<Btn2>:f.deiconify f.stop f.iconify\n\
+	<Btn3>:f.menu (uwm_menu) \n
+	<Key>L1:f.raise\n\
+	<Key>L2:f.lower\n\
+	<Key>L3:f.deiconify f.stop f.iconify\n\
+
+! default for other clients
+
+! icon layout for anything else
+! we could have use this for xterms also
+Swm*panel.normalIcon:\
+        button iconImage        +C+0\
+        button    iconName        +C+1\
+
+! max text len for an icon is 7 chars
+Swm*button.iconName.maxIconLabel:7
+
+!Swm*normalIcon*foreground:black
+!Swm*normalIcon*background:white
+Swm*normalIcon*foreground:white
+Swm*normalIcon*background:black
+
+!bindings for the icons same as xtermIcon
+Swm*panel.normalIcon.bindings:\
+        <Btn1>:f.move f.raise \n\
+        <Btn2>:f.deiconify f.stop f.iconify\n\
+        <Btn3>:f.menu (uwm_menu) \n
+        <Key>L1:f.raise\n\
+        <Key>L2:f.lower\n\
+        <Key>L3:f.deiconify f.stop f.iconify\n\
+
+! we dont want decorations on some specific clients
+
+Swm*icon:normalIcon
+Swm*xclock.icon: noTextIcon
+Swm*xload.icon: noTextIcon
+!Swm*smail.icon: noTextIcon
+Swm*xclock.decoration:none
+
+! we want their icons to behave right so we do some binding etc
+! even thought no decorations are present
+Swm*panel.none:panel client +0+0
+
+Swm*panel.noTextIcon:\
+	button iconImage	+C+0\
+
+Swm*panel.noTextIcon*foreground:white
+Swm*panel.noTextIcon*background:black
+
+! note these are the same as xtermIcon and normalIcon bindings
+! so everything works the same
+Swm*panel.noTextIcon.bindings:\
+	<Btn1>:f.move f.raise \n\
+	<Btn2>:f.deiconify f.stop f.iconify \n\
+	<Btn3>:f.menu (uwm_menu) \n
+
+! root pop ups  
+Swm*panel.root.bindings: \
+        <Btn3> : f.menu(uwm_menu) \n
+
+! uwm menu
+Swm*menu.uwm_menu*foreground:white
+Swm*menu.uwm_menu*background:black
+
+! this is where you want to add stuff for changing your uwm popup.
+Swm*menu.uwm_menu:\
+    "Window Ops"        f.title								        \
+    Shell 		f.exec("xterm -geometry 50x30 -ls -sb -n shell -bw 5 -sl 2000 &")\n	\
+    Raise               f.raise         							\
+    Lower               f.lower         							\
+    Iconify             f.iconify f.stop f.deiconify  						\
+    "more..."           f.menu(more)    							\
+    "move"              f.move f.raise  							\
+    "resize"            f.resize								\
+    "restart"		f.restart
+
+Swm*menu.more: \
+    "refresh"           f.refresh       \
+    "f.winrefresh"      f.winrefresh
+	
+
+
+

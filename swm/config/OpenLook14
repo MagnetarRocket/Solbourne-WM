@@ -1,0 +1,19 @@
+!**********************************************************************
+!
+!    Swm template for 14 point Open Look
+!        The first few lines here are the only ones that need
+!        to be changed to get different point sizes
+!
+!    Author: Tom LaStrange
+!    Date:   07/26/89
+!    $Id: OpenLook14,v 9.1 1990/05/31 07:53:40 toml Exp $
+!
+!**********************************************************************
+
+Swm*font: -adobe-courier-medium-r-normal--14-140-75-75-m-90-iso8859-1
+Swm*button.name.font: -adobe-courier-bold-r-normal--14-140-75-75-m-90-iso8859-1
+Swm*button.pullDown: @OLpull14.xbm
+Swm*resizeWidth: 5
+Swm*resizeLength: 11
+
+swm*configuration: OpenLook.com

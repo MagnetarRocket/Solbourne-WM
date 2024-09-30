@@ -1,0 +1,15 @@
+/**/# This does not belong here!
+CC = cc
+
+LOCAL_LIBRARIES = $(XLIB)
+           SRCS = swmxlate.c
+           OBJS = swmxlate.o
+
+ComplexProgramTarget(swmxlate)
+
+MakeDirectories(install, $(BINDIR))
+
+SRCDIR = $(DESTDIR)/swmxlate
+MakeDirectories(install_src, $(SRCDIR))
+InstallMultipleDestFlags(install_src,$(SRCS),$(SRCDIR),$(INSTDATFLAGS))
+InstallMultipleDestFlags(install_src,makefile.site,$(SRCDIR)/Makefile,$(INSTDATFLAGS))
