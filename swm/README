@@ -1,0 +1,117 @@
+September 29, 1993
+
+Enclosed you will find source code to swm, the ParcPlace (formerly
+Solbourne) Window Manager.  With the source code, you'll find the swm
+man page (swm.man) and a postscript copy of my paper that appeared in
+the Summer 1990 USENIX proceedings.  These will hopefully give you
+enough information to get you started.  Even though it's four years old,
+it still has some very unique features:
+
+    1. No default look and feel.  Templates are provided for motif and
+       open look.
+    2. Was the first X window manager to implement a "Virtual Desktop."
+    3. Configuration is done completely through X resource files.
+    4. Allows panels of buttons on the root window.
+    5. Provides primitive session management.
+    6. Can be sent window manager commands from outside programs
+       (swmcmd).
+
+swm was developed on top of and relies upon the Object Interface (OI)
+toolkit.  If you don't have a copy of OI, get one.  If you're using
+Linux on a PC, you can get a free copy of ObjectBuilder and OI as
+follows:
+
+The release is available from tsx-11.mit.edu in
+/pub/linux/packages/OI.  The files under that directory are:
+	COPYING		States the terms and conditions of copying
+			this release.
+	oi1, oi2, oi3	subdirectories that correspond to three 3.5"
+			floppies that are in SLS format and can be
+			installed with sysinstall.
+	oi40.tar	The above subdirectories as one file
+
+OI for Linux is also available directly from ParcPlace for a nominal
+fee that covers our manufacturing costs. In addition to 3 diskettes
+containing the software, you will get a 250 page book for ObjectBuilder
+and a 1200 page book for OI. Books alone are $60, books and media are
+$100 plus shipping and applicable taxes.  Send email to
+info@parcplace.com or call 1-800-759-7272 (USA and Canada) or
+1-408-481-9090 (ask for international sales) for more information.
+
+As far as I know, swm has not yet been ported to Linux.
+
+
+***  MAJOR DISCLAIMER  ***
+
+Most of swm was written in 1989, before OI had many of the features
+that it sports today.  Because of this, swm implements many things
+itself rather than relying on the toolkit.  Among these are:
+
+    1. X resources.  swm fetches all of its resources with little
+       assistance from the toolkit.
+    2. Layout of the window frames and icons are all done by swm rather
+       than using any of the OI layout methods.
+    3. swm handles all mouse and keyboard translations itself rather than
+       depending on the translation manager code in OI.	
+
+swm was my first OI program AND my first C++ program.  It is
+absolutely horrible in its use of the language.  It should NOT be taken
+as an example of how to write an OI program, how to program in C++, or
+used as a gauge of my current OI/C++ abilities :-)  I do not currently
+plan to maintain this stuff or send out new releases or bug fixes.  It
+is provided "as is."
+
+**********************************************************************
+Building this stuff
+
+Provided is an
+	Imakefile         Will work with some tweaking
+	Makefile.sunos    Minimal makefile for SunOS 4.1.x machines
+
+If all goes well, you should end up with an swm binary.  This can
+be installed anywhere you choose.
+
+If you are building on Solaris, you'll probably want to copy
+lex.C.sunos to lex.C rather then letting lex build one for you.  The
+Solaris generated lex.C causes swm to hang and I didn't have the time
+or the energy to track it down.
+
+In the "config" subdirectory are the template files for swm.  These
+files define different look-and-feel's for swm.  swm MUST be able to
+find these, or something like them in order to run, it has no default
+look-and-feel built in.  The standard place for installation of these
+files in in
+
+	/usr/lib/X11/swm/
+
+If you install them someplace else, like "/usr/local/lib/swm/" then you
+need to set some X resources as follows:
+
+	swm*configPath: /usr/local/lib/swm/
+	swm*bitmapPath: /usr/local/lib/swm/
+
+To use a specific configuration, add a resource like:
+
+	swm*configuration: OpenLook3d+
+
+And away you go.
+
+There are subdirectories that contain swm related tools.
+Unfortunately, the top-level Imakefile does not know about these
+subdirectories so you'll have to go into each of them and do an "xmkmf"
+and "make."
+
+	swmcmd		- allows execution of swm commands from shell 
+	swmhints	- utility to help with primitive session management
+	swmxlate	- translate relative to absolute virtual desktop coords
+	ssetroot	- replacement for xsetroot
+
+Man pages and the postscript paper can be found in the "man" subdirectory.
+
+--
+Tom LaStrange
+
+ParcPlace Boulder          toml@boulder.ParcPlace.COM
+4909 Pearl East Cir.
+Suite 200
+Boulder, CO  80301

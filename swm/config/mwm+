@@ -1,0 +1,197 @@
+!**********************************************************************
+!
+!    Swm template for mwm+
+!    normal mwm functionality plus virtual root and sticky glyph
+!
+!    Author: Kelly Rise
+!    Date:   11/01/90  
+!
+!    $Id: mwm+,v 1.5 1990/12/26 09:08:21 toml Exp $
+!
+!**********************************************************************
+swm*configuration:	mwm.com
+
+
+! virtual desktop
+Swm*virtualDesktop: 4608x3600
+Swm*virtualDesktop.scrollBars: False
+Swm*virtualDesktop.panner.scale: 25
+Swm*virtualDesktop.panner.geometry: -0-0
+Swm*virtualDesktop.panner.initialState: NormalState
+
+! the nail buttons
+Swm*monochrome*button.nail: @MnailOut.xbm
+Swm*monochrome*sticky*button.nail: @MnailIn.xbm
+
+Swm*button.nail: \
+	@MnailOutTB.xbm	top	bottom \
+	@MnailOutBT.xbm	bottom	top
+
+Swm*sticky*button.nail: \
+	@MnailInTB.xbm	top	bottom \
+	@MnailInBT.xbm	bottom	top
+
+! the default window decoration
+Swm*decoration: motif
+Swm*panel.motif: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button min		-1+0 \
+    button nail		-2+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+! transient window decoration
+Swm*transient.decoration: motif.2
+Swm*transient*resizeCorners: True
+Swm*transient*resizeBars: True
+
+!**********************************************************************
+! The following panel definitions are to support the _MOTIF_WM_HINTS
+! property.  The bits are specified as follows:
+!
+!          3                   2                1               0
+! MWM_DECOR_MAXIMIZE  MWM_DECOR_MINIMIZE  MWM_DECOR_MENU  MEM_DECOR_TITLE
+!
+!**********************************************************************
+
+Swm*panel.motif.0: \
+    panel client	+0+1
+	
+Swm*panel.motif.1: \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.2: \
+    button menuB	+0+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.3: \
+    button menuB	+0+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.4: \
+    button min		-1+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.5: \
+    button min		-1+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.6: \
+    button menuB	+0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.7: \
+    button menuB	+0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.8: \
+    button max		-0+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.9: \
+    button max		-0+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.10: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.11: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.12: \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.13: \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.14: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif.15: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    button nail		-2+0 \
+    panel client	+0+1
+
+Swm*panel.motif*button.nail.bindings:	\
+	bindings stickit
+Swm*sticky*panel.motif*button.nail.bindings:	\
+	bindings unstickit
+
+Swm*monochrome*panel.motif*button.nail.bindings:	\
+	bindings stickit
+Swm*monochrome*sticky*panel.motif*button.nail.bindings:	\
+	bindings unstickit
+
+Swm*bindings.stickit:	\
+	<Btn1> : f.stick f.falsestop	\
+	f.newbuttonimage(nail, "@MnailInTB.xbm top bottom @MnailInBT.xbm bottom top")	\
+	f.rebind(nail, unstickit)
+Swm*bindings.unstickit:	\
+	<Btn1> : f.unstick f.falsestop	\
+	f.newbuttonimage(nail, "@MnailOutTB.xbm top bottom @MnailOutBT.xbm bottom top")	\
+	f.rebind(nail, stickit)
+Swm*monochrome*bindings.stickit:	\
+	<Btn1> : f.stick f.falsestop f.newbuttonimage(nail, @MnailIn.xbm) f.rebind(nail, unstickit)
+Swm*monochrome*bindings.unstickit:	\
+	<Btn1> : f.unstick f.falsestop f.newbuttonimage(nail, @MnailOut.xbm) f.rebind(nail, stickit)
+	
+! What the mouse buttons & arrow keys do on the root window
+Swm*root.bindings: \
+    	<Btn3>		:	f.menu(workspace)	\
+	<Key>Up		:	f.scrollup		\
+	<Key>Down	:	f.scrolldown		\
+	<Key>Left	:	f.scrollleft		\
+	<Key>Right	:	f.scrollright		\
+Meta	<Key>Up		:	f.scrollup		\
+Meta	<Key>Down	:	f.scrolldown		\
+Meta	<Key>Left	:	f.scrollleft		\
+Meta	<Key>Right	:	f.scrollright		\
+Shift	<Key>Up		:	f.scrollup(2)		\
+Shift	<Key>Down	:	f.scrolldown(2)		\
+Shift	<Key>Left	:	f.scrollleft(2)		\
+Shift	<Key>Right	:	f.scrollright(2)

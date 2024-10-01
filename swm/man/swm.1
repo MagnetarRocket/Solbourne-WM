@@ -1,0 +1,1712 @@
+.TH SWM 1 "26 February 1992" 
+.SH NAME
+swm \- ParcPlace window manager 
+.SH SYNOPSIS 
+.PP 
+\f3swm\f1 [\f3-single\f1]
+.sp 
+.SH DESCRIPTION 
+.PP 
+\f3swm\f1 is an X Window System window manager with a
+user-configurable look-and-feel.  It comes with standard configuration
+files for the OPEN LOOK, Motif, \f3uwm\f1\|(1) and \f3twm\f1\|(1)
+styles.  It also provides a "virtual desktop" facility, whereby the
+size of the screen is effectively expanded, areas off-screen being
+brought into view by panning up, down, left, or right.  Users may
+specify one of these packages, add their own extensions, or build
+something entirely different.
+.PP 
+The appearance and functionality of \f3swm\f1 are specified by X
+resources which are defined in the .Xdefaults file or through the use
+of \f3xrdb\f1\|(1).  The simplest way to use \f3swm\f1 is to place a
+single line in the .Xdefaults file (or the resource file used by
+\f3xrdb\f1), specifying any one of the standard configuration files:
+.sp 
+.in +5 
+swm*configuration: OpenLook+
+.br
+swm*configuration: OpenLook10 
+.br
+swm*configuration: OpenLook12 
+.br
+swm*configuration: OpenLook14 
+.br
+swm*configuration: OpenLook3d
+.br
+swm*configuration: OpenLook3d+
+.br
+swm*configuration: mwm 
+.br
+swm*configuration: mwm+ 
+.br
+swm*configuration: twm 
+.in -5 
+.PP 
+Note that only one of the above lines should be used at a time.  The
+files OpenLook10, OpenLook12, and OpenLook14 differ only in the point
+size used in menus and window decorations; the OpenLook+ file adds the
+virtual desktop feature. OpenLook3d+ implements the 3-dimensional 
+OPEN LOOK style.
+.PP 
+Add-on customization can be achieved by placing resource definitions
+in the .Xdefaults file, or specifying an additional file of resource
+information:
+.sp 
+.in +5 
+swm*configuration:  OpenLook+  ~/.OpenLookExtra 
+.in -5 
+.PP 
+The above example indicates customizations are found in the file named
+\&.OpenLookExtra in the user's home directory.
+.PP 
+The standard configuration files, found in the /usr/lib/X11/swm
+directory, provide examples of \f3swm\f1 resource definitions.
+.PP
+In this man page, mouse buttons are referred to in numerical order from
+left-to-right (1, 2, and 3).  Thus, mouse button 1 is the left button,
+2 is the middle, and 3 is the right.
+.sp 
+.SH OPTIONS 
+.sp 
+.IP "\f3\-single   \f1" 
+When used with a multi-screen display, starts \f3swm\f1 on a single
+screen.
+.sp
+.SH USAGE
+.PP
+The first portion of this section describes the user interface
+provided by one of the standard configuration files.  The remainder
+presents an overview of \f3swm\f1 concepts which apply to
+customization of the window manager.
+.sp
+.SS The OpenLook+ User Interface
+.IP "Windows"
+Applications are generally launched from within a terminal emulator
+such as an xterm window.  Once a window is displayed, you have access
+to the Window menu by pressing mouse button 3 while pointing at the
+title bar at the top of the window.  The Close option iconifies the
+window; the same effect can be achieved by clicking mouse button 1
+while pointing at the menu glyph.  The Full Size option increases the
+size of the window to cover the entire display; when that is done, the
+option changes to Restore Size.  The Properties option is not
+implemented.  The Back option places the window behind other windows.
+The Refresh option redraws the contents of the window.  The Quit
+option kills the application.
+.sp
+When pointing at the title bar of a window, clicking mouse button 1
+exposes the window; dragging button 1 moves the window.
+.sp
+When pointing within a window, key F1 exposes the window; F2 hides it
+behind other windows, and L1 iconifies the window.
+.sp 
+.IP "Icons"
+Icons can be moved by pointing to them and dragging mouse button 1.  A
+click of button 1 can be used to expose a partially hidden icon.
+Pressing button 3 opens the same Window menu as discussed above,
+except the first option is Open, which opens the window.
+.sp
+.IP "The Virtual Desktop"
+The Virtual Desktop panner appears in the lower-right corner of the
+screen, and represents 4x4 screenfuls of area.  The size of the
+virtual desktop may be changed interactively by resizing the panner.
+The currently-displayed portion of the virtual desktop is indicated
+with a dotted outline.  Windows are represented by white rectangles.
+Tiny rectangles representing icons may also be visible.  Drag button 1
+within the dotted area to pan the desktop.  The cursor keys may be
+used to jump within the virtual desktop: by one screenful or (shifted)
+by two.
+.P
+Drag button 2 within a white rectangle to move the corresponding
+window or icon.  When moving a window, you may move the pointer
+outside the panner, causing an outline of the window to appear on the
+desktop for more precise positioning.
+.sp
+The Virtual Desktop by default is ``sticky,'' which means it stays in
+place when the desktop is scrolled.  The glyph in its upper right
+corner changes appearance if mouse button 1 is clicked on it, and the
+window becomes "unsticky".  Clicking button 1 on the same glyph in
+other windows also changes them to sticky or not.
+.sp
+.IP "The Workspace Menu"
+The Workspace menu appears when mouse button 3 is pressed while
+pointing at the root window.  The Programs option brings up a submenu
+for opening other X applications.  The Utilities option brings up a
+submenu, in which only the Refresh option is implemented; it redraws
+the entire display.  The Properties option is not implemented.  The
+Restart option restarts the window manager; this can be used after
+editing the .Xdefaults file or a custom configuration file.  The Exit
+option exits the window manager, but this does not necessary exit from
+the X Window System entirely.
+.sp
+The \f3swm\f1 Functions menu appears when mouse button 1 is pressed
+while pointing at the root window.  It has three submenus which list
+the built-in functions alphabetically.  See the X DEFAULTS section
+below for a description of each function.
+.br
+.ne 5
+.SS Objects
+.PP
+\f3swm\f1 uses the following object types:
+.sp
+.IP "Panel Object"
+An swm panel object is made up of one or more objects, and can also
+include other panels.  There are decoration panels, icon specification
+panels, root panels, and icon panels.
+.sp
+A \f3decoration panel\f1 is a panel that will be used to enclose (and
+reparent) a client application window.  A decoration panel must
+contain a panel object named \f3client\f1 which represents the client
+window that will be reparented.
+.sp
+An \f3icon specification panel\f1 is a panel which specifies the
+appearance of an icon for a given client window.
+.sp
+A \f3root panel\f1 is a panel of objects placed on the X root window.
+This panel typically contains buttons used to execute \f3swm\f1
+functions.
+.sp
+An \f3icon panel\f1 is a special form of root panel used to manage the
+storage of icons.  Placed on the X root window like a root panel, an
+icon panel contains a special panel called \f3icons\f1, which is a box
+with optional scroll bars attached to the bottom and right sides.
+Icons dragged into the box are automatically positioned in rows inside
+the box.
+.sp
+.IP "Button Object"
+An \f3swm\f1 button object is an object that either contains the image
+of a bitmap file or a text string.  A special button object called
+\f3iconImage\f1 can be used when defining an icon specification panel.
+This special button contains the image of the icon, if any, as
+supplied by the client.  If not specified by the client the
+\f3defaultIconImage\f1 resource can be used to specify a bitmap file.
+.sp
+There are two other special button objects called \f3name\f1 and
+\f3iconName\f1.  The \f3name\f1 button object can be specified in a
+decoration panel to display the window name of a client.  The
+\f3iconName\f1 button object can be used in an icon specification
+panel to display the icon name of a client.
+.IP "Text Object"
+An \f3swm\f1 text object is used to display or hold an editable text
+string.  There are two special text objects that can be used in
+addition to a plain text object, which is simply a multi-line text
+holder.  The special text objects in swm are called \f3name\f1 and
+\f3iconName\f1.
+.sp
+The \f3name\f1 text object can be specified in a decoration panel to
+display the window name of a client.  This is the same as the
+corresponding button object except the text object can be edited.
+.sp
+An \f3iconName\f1 text object can be used in an icon specification
+panel to display the icon name of a client.  This is also the same as
+the corresponding button object except it can be edited.
+.sp
+.IP "Menu Object"
+An \f3swm\f1 menu object is a pop-up menu, typically tied to another
+\f3swm\f1 object through a \f3binding\f1 which causes the menu to be
+displayed.
+.sp
+.IP "Icon Region Object"
+An icon region is simply a specification for an area into which icons
+are placed.  Unlike other swm objects, icon regions accept only a few 
+resources (gravity, followClient, packImmediate, pad and overlay).
+When setting resources for icon region objects use the object type (iconRegion) to affect all icon regions, or the object type and name (iconRegion.\f3icon-region-name\f1) to affect a specific region.
+These resources and defining icon regions are described under Resources.
+.sp
+.SS Reparenting
+.PP
+\f3swm\f1 is a reparenting window manager, which means it becomes the
+parent of application windows.  Clients creating windows that are
+children of the X root window have a decoration panel object created
+for their top level window.  The client window is then displayed
+within the decoration panel.  A panel object specified with the name
+\f3client\f1 causes a \f3client panel\f1 to be created that simply
+contains the client window.  This panel can then be combined with
+other panels to control the look and feel of the window manager.
+.PP
+Traditional reparenting window managers provide a simple title bar for
+a client which might contain glyphs that execute window manager
+functions.  The \f3swm\f1 panel provides a much more flexible
+approach.  There are no built-in constraints on the organization of
+objects within a panel.  Although most window managers place glyphs
+above the client window, they could just as easily be placed below.
+.sp
+Several of these panels can be built and assigned to different classes
+of clients.  For example, one could have no decoration on an xclock,
+but provide a panel with a title bar for an xterm.
+.sp
+.sp
+.SS The Virtual Desktop
+.PP
+\f3swm\f1 provides a feature not found in any other currently
+available window manager, called the Virtual Desktop.  This feature
+effectively makes the root window larger than the physical display and
+allows you to pan around this large root window. Panning can be done
+with scrollbars, with an object called the panner, and with window
+manager functions.
+.sp
+The virtual desktop contains optional scrollbars which can be used to
+position the display within the virtual desktop.  The optional panner
+is a miniature view of the virtual desktop and shows small
+representations of the windows currently on the virtual desktop.
+.sp
+Using the panner is simple: mouse button 1 drags an outline in the
+panner window that represents the view on the virtual desktop.  When
+the mouse button is released, the portion of the virtual desktop
+outlined in the panner is displayed on the screen.  You can also move
+windows using the panner.  Mouse button 2 pressed in any of the window
+representations within the panner causes a move operation to be
+started on the object within the panner.  When the mouse button is
+released, the object will be moved within the virtual desktop.  During
+this operation, the cursor may be moved outside the panner object,
+causing an outline of the window being moved to appear on the desktop.
+This allows the window to be positioned more accurately.
+.sp
+The third way to move around the virtual desktop is through the use of
+window manager functions.  \f3swm\f1 provides functions to scroll the
+virtual desktop by physical screen size dimensions.  These are
+typically bound to the cursor keys, so that pressing the right arrow
+key, for example, causes a jump to the right by one screenful.
+.sp
+.ne 4
+.SS Sticky Windows
+.PP
+When the virtual desktop is enabled with the panner, you will notice
+that the panner is not attached to the virtual desktop, i.e., it does
+not scroll away when the virtual desktop is scrolled.  The virtual
+desktop panner is by default a "sticky" window.  Sticky windows sit
+logically on top of the virtual desktop rather than being within the
+virtual desktop.  A sticky window cannot be covered by a non-sticky
+window.
+.PP
+The \f3sticky\f1 resource can be used to make certain classes of
+windows be sticky when they start up.  This keeps those windows in
+view at all times, regardless of the area of the virtual desktop
+window that is currently displayed.  A user could set up various
+environments in different areas of the virtual desktop, but keep a few
+windows in view constantly.
+.PP
+If \f3swm\f1 finds that a window is sticky, it appends the string
+"sticky" to the window class so that you can specify specific window
+decorations for sticky windows.  A good example of this is shown in
+the \f3OpenLook+\f1 configuration file.
+.PP
+\f3swm\f1 also provides functions that allow the user to interactively
+stick and unstick windows.
+.SS Saving the Window Layout
+.PP
+The function f.places enables the user to save a window layout for
+subsequent sessions. The size and location of each client (whether
+window or icon) is saved in a file whose name is given as an argument
+to f.places. If no argument is given, the file is named .swm.restart
+by default.
+.PP
+The file created by f.places may then be used instead of the user's
+\&.xinitrc file. At the time the X server is started, the file created
+by f.places runs additional commands from the file \&.xinitrc.local.
+There, the user should place commands such as \f3xhost\f1\|(1) which
+establish preconditions for clients.
+.PP
+The f.places function may be combined with the f.quit function to
+provide a mechanism for restarting X with the window layout in use at
+the time the previous session ended.  To do this, 
+two steps are necessary.  First, bind the following
+sequence to the Exit command of the workspace menu. For example:
+.in +5
+.nf
+.sp
+swm*menu.workspace: \e
+   (other menu items ...)
+   Exit		f.places("~/tmp/.xinitrc") f.quit
+.sp
+.in -5
+.fi
+Before running f.places with the argument shown above, make a backup
+copy of your .xinitrc file. Some entries in it may need to be placed
+in the .xinitrc.local file, since they won't automatically be put in
+the version of .xinitrc created by f.places.
+.PP
+See the menu resource entry in the X DEFAULTS section for a discussion
+of menu specifications.
+.PP
+The second step is to start the X server from a script 
+such as the following:
+.in +5
+.nf
+.sp
+xinit
+kbd_mode -a
+mv ~/tmp/.xinitrc $HOME/.xinitrc
+clear
+.sp
+.in -5
+.fi
+In addition to starting X, after the X session has ended this script
+resets the keyboard, moves the temporary file to the home directory,
+and clears the screen.
+.sp
+.SS Shaped Objects
+.PP
+When used with the X11R4 server, \f3swm\f1 allows the definition of
+non-rectangular windows. The shape and shapeMask resources provide
+this functionality.  By defining a decoration panel and setting its
+shaped resource True, a window can be created in a shape containing
+the client.  For example, the circular \f3oclock\f1\|(1) can be placed
+in a similar window as follows:
+.sp
+.in +5
+.nf
+swm*oclock*decoration: shaped
+swm*panel.shaped: panel client +0+0
+swm*panel.shaped*shape: True
+.fi
+.in -5
+.PP
+With the shapeMask resource and the \f3bitmap\f1\|(1) utility, users
+can create a window with any shape, including irregular edges and
+non-contiguous areas. Bits set in the bitmap become part of the window
+area; those that are not set are outside the window. The shapeMask
+resource is then used to specify the bitmap. In the following example,
+the \f3snews\f1\|(1) utility's icon is given a shape defined in the
+file snews.mask:
+.sp
+.in +5
+.nf
+swm*snews*icon: noTextIcon
+swm*snews*iconImage.shapeMask: @snews.mask
+swm*panel.noTextIcon: \e
+	button iconImage +0+0
+swm*panel.noTextIcon*shape: True
+.fi
+.in -5
+.PP
+If \f3swm\f1 finds that a window is shaped, it appends the string
+\&"shaped" to the window class so that you can specify specific window
+decorations for shaped windows.
+.sp
+.SH X DEFAULTS 
+.PP 
+\f3swm\f1 gets its initialization information from the X server
+resource manager.  Resources have the form:
+.sp 
+.in +5 
+swm*[color | monochrome]*screen\f2screennumber\f1*\f2resource\f1 
+.sp 
+.in -5 
+The first resource in the hierarchy is the \f3screen\f1 resource,
+which allows resources to be set up on a screen by screen basis.  For
+example:
+.sp 
+.in +5
+swm*screen0*foreground: red
+.br
+swm*screen1*foreground: green
+.br
+swm*color*foreground: red
+.br
+swm*monochrome*foreground: white
+.in -5 
+.sp
+This example sets the default swm foreground color to red on screen
+zero and green on screen one.  
+.sp 
+.SS General Resources 
+.PP 
+General resources are those that do not specifically deal with
+clients.  Most of these resources are used to build panels and 
+construct menus.
+.in +5
+.IP "\f3bindings.\f2binding-name\f1: \f2binding-list\f1"
+This resource lists generic bindings, not associated with any
+particular object.  The bindings referenced in this resource can be
+used in other bindings definitions, making them nested, or through the
+f.rebind command.  The following shows an example of this resource
+being used, both nested and in an f.rebind command:
+.in +5
+.sp
+.nf
+swm*bindings.basic: \e
+	<Key>L1   :	f.iconify \e
+	<Key>F24  :	f.savepointer f.warptoscreen
+.sp
+swm*bindings.other: \e
+	<Key>F1   :	f.raise \e
+	bindings 	basic
+.sp
+f.rebind(some_object, basic);
+.fi
+.in -5
+.sp
+.IP "\f3bitmapPath\f1: \f2directory\f1[\f2:directory\f1]" 
+This resource specifies a directory path to search when looking for
+bitmap files for objects.  The specified path will be searched first
+followed by the two directories /usr/lib/X11/swm and
+/usr/include/X11/bitmaps.
+.IP "\f3button\f1.\f2button name\f1: \f2label\f1"
+This resource is used to create a button object.  The \f2button
+name\f1 is the name of the button object and will be used to refer to
+resources using the button.  The \f2label\f1 is a character string
+that will be displayed inside the button unless the string begins with
+the "@" character.  If the string begins with the "@" character, it
+will be taken to be a file name for an X bitmap file and will be used
+as the image of the button rather than a text string.  The
+\f3bitmapPath\f1 resource specifies which directories will be searched
+for bitmap files.  Three special buttons are available only for use
+when defining an icon specification panel.  They are the
+\f3iconImage\f1, which contains the client supplied image of its icon
+(if one is supplied), the \f3iconName\f1, which displays the client's
+icon name, and the \f3name\f1, which displays the client's window
+name.
+.sp
+In addition to a single label value, a button can be
+made to have a 3D appearence by specifying more than
+one bitmap file plus a description of what pixels the
+bitmap file should be painted with.  The syntax for such a
+button would be as follows:
+.sp
+.in +5
+.nf
+bitmap-file  inactive-pixel  active-pixel \\
+bitmap-file  inactive-pixel  active-pixel \\
+bitmap-file  inactive-pixel  active-pixel \\
+       .
+       .
+       .
+.in -5
+.fi
+.sp
+The inactive and active pixel values describe what color
+each bitmap file is painted with in both an inactive and
+an active (mouse button depressed) state.
+The inactive and active pixel parameters can be any one of the
+following values:
+.sp
+.in +5
+.nf
+\f3top\f1 - the current top bevel color
+\f3bottom\f1 - the current bottom bevel color
+\f3foreground\f1 - the current foreground color
+\f3background\f1 - the current background color
+\f3down\f1 - the current depressed color
+\f3none\f1 - do not paint the bitmap-file
+.in -5
+.fi
+.sp
+For example, the pull-down glyph in the \fBOpenLook3d+\fP
+configuration file is defined as follows:
+.sp
+.in +5
+.nf
+Swm*button.pullDown: \\
+        @OLpullTB.xbm top bottom                \\
+        @OLpullBT.xbm bottom top                \\
+        @OLpullBB.xbm bottom bottom             \\
+        @OLpullTT.xbm top top                   \\
+        @OLpullDD.xbm down down                 \\
+        @OLpullbD.xbm background down
+.in -5
+.fi
+.sp
+The button is composed of six bitmap files that when combined
+display the image of the pull down button with a 3D appearence.
+.IP "\f3configPath\f1: \f2path\f1"
+This resource is similar to the bitmapPath resource.  It contains a
+list of directories to search for the configuration resource.
+.IP "\f3configuration\f1: \f2file names\f1"
+This resource specifies the file or files which determine the look and
+feel which \f3swm\f1 presents.  \f3swm\f1 first looks for the files in
+the current directory; if not found there, the /usr/lib/X11/swm
+directory is searched.
+.IP "\f3debug\f1: \f2level\f1"
+This resource provides the swm developer the ability to print out
+debug information during swm execution.  The \f2level\f1 indicates the
+level of debug information desired.  Currently there are only two
+levels.  Level 2 provides the most detailed information.  This
+variable should probably be used in conjunction with the
+\f3debugFile\f1 resource to specify a file to write the debug
+information to.  If no \f3debugFile\f1 is specified, the debug
+information is written to stderr.  The \f3debug\f1 and \f3debugFile\f1
+resources can only be used if swm is compiled with the -DDEBUG option.
+.IP "\f3debugFile\f1: \f2file name\f1" 
+This variable specifies the file name to write debug information to
+when the \f3debug\f1 resource is used.
+.IP "\f3eventFile\f1: \f2file name\f1"
+This resource specifies a file to which debug information about X
+events is written.
+.IP "\f3iconGravity\f1: [NorthWest | EastSouth ...]"
+This is the simplest way to specify icon gravity.  A default icon
+region covering the entire screen is created with the specified gravity.
+Gravity may be any combination of two orthogonal directions.  Icons start 
+at the corner of the screen specified by the gravity; NorthWest is the 
+upper left corner.  The direction named first is the primary axis; icons 
+travel first on that axis.  An icon region is the area into which icon are 
+placed, by default icon region are the entire screen.  Once a row (or column) 
+of icons is filled, another row (or column) is started on the secondary axis.
+NorthWest icon gravity means icons start in the upper left corner, travel 
+down the screen to the south west corner, then another row starts to the 
+right (east) of the first row.  Icon panels and icons placed on the root (via 
+an iconGeometry specification) take precedence over icon gravity.  An icon 
+loses gravity if it is moved; gravity can be restored with the f.gravity 
+function.  Sticky icons are always placed before non-sticky icons; therefore 
+when you iconify a sticky client other icons may move.
+By default ``holes'' in the region, created by moving an icon or killing the
+client, are filled immediately by packing the remaining icons.
+Use the function f.reshuffle to pack a region for which packImmediate is false.
+.IP "\f3iconRegions\f1: \f2region components\f1"
+This resource creates icon regions.  The \f2region components\f1 consist of
+one or more regions.  The syntax of a region component is:
+.sp
+.in +5
+\f2type\f1 \f2name\f1 \f2geometry\f1
+.sp
+.in -5
+The \f2type\f1 is either \f3relative\f1 or \f3absolute\f2, \f2name\f1 is a
+unique name for the region, and \f2geometry\f1 indicates the dimensions and
+location of the region.
+\f2geometry\f1 must be a full geometry specification in the form:
+.sp
+.in +5
+\f2width\f3x\f2height\f3\(+-\f2x\f3\(+-\f2y\f1
+.sp
+.in -5
+\f3relative\f1 denotes an icon region should be created for each 
+screen on the virtual desktop, \f3absolute\f1 denotes only one icon region
+should be created.  Regardless of the \f2type\f1, the \f2geometry\f1 is
+relative to the underlying root window, which is the size of the
+virtual desktop.
+The following creates two icon regions, one named foobar and one named sticky:
+.sp
+.nf
+.in +5
+swm*iconRegions:	\e
+	relative	foobar	300x100-0+0 \e
+	absolute	sticky	200x100+0+0
+.sp
+.in -5
+.fi
+Icons are matched to a region based on the name of the region.
+\f3swm\f1 first checks if the client named an icon region via an \f3iconRegion\f1 resource,
+then looks for a region named \f3sticky\f1 if the client is sticky, 
+then looks for regions matching the class name, then client name and finally 
+a default region (named Default).
+If you named an icon region \f3foobar\f1 in which you want xterms to iconify you
+would specifiy the \f3iconRegion\f1 resource for xterms in this manner:
+.sp 
+.in +5 
+swm*xterm*iconRegion: foobar
+.sp 
+.in -5
+.IP "\f3macro\f1.\f2macro name\f1: \f2functions\f1" 
+This resource specifies a macro which is simply a list of functions to
+be executed.  For example:
+.sp 
+.in +5 
+swm*macro.moveraise: f.move f.raise 
+.sp 
+.in -5
+Would be used by executing the command 
+.sp 
+.in +5 
+f.macro(moveraise)
+.sp 
+.in -5 
+.IP "\f3maxIconLabel\f1: \f2characters\f1"
+This resource specifies the maximum number of characters that may be
+displayed in an icon label.  Truncating a long icon name prevents the
+icon becoming too large.  The default is 8 characters.
+.IP "\f3menu\f1.\f2menu name\f1: \f2menu entries\f1" 
+This resource creates a menu.  Each menu entry has the following
+syntax:
+.sp 
+.in +5
+\f2string\f1 \f2function [function]\f1 
+.sp 
+.in -5 
+Where \f2string\f1 is the text displayed in the menu entry.  If the
+string contains any white space characters, it should be enclosed in
+double quotes.  If the string begins with an "@" character, it will be
+taken to be an X bitmap file and will be used to form the image of the
+menu entry rather than a character string.  Following the
+\f2string,\f1 one or more swm functions may be specified to be
+executed when the menu item is selected.  For example, here is a menu
+specification for a menu named \f3foo:\f1
+.in +5
+.sp 
+.nf 
+swm*menu.foo:		\e
+ 	"Window Ops"	f.title	\e
+ 	Raise		f.raise	\e
+ 	Lower		f.lower	\e
+ 	"(De)Iconify"	f.iconify f.stop f.deiconify
+.in -5
+.sp
+.fi
+The title of the menu is "Window Ops."  It has three options, the
+first two of which raise or lower the object with respect to other
+objects on display. The last option can be used either to iconify or
+deiconify an object, depending on its present state.
+.IP "\f3moveCursor\f1: \f2cursor\f1"
+This resource specifies the cursor shape to use when performing the
+window move function.  The \f2cursor\f1 should be a name from the
+cursorfont.h file.  The default resize cursor is "fleur."
+.IP "\f3moveDelta\f1: \f2pixels\f1"
+This resource specifies how many pixels the mouse must move before a
+window move function is started.  The default is three pixels.
+.IP "\f3panel\f1.\f2panelname\f1: \f2panel components\f1"
+This resource creates a panel object.  The \f2panel components\f1
+consist of one or more named objects with a geometry specification.
+The syntax of a panel component is:
+.sp
+.in +5
+\f2type\f1 \f2name\f1 \f2geometry\f1
+.sp
+.in -5
+The
+\f2type \f1
+is the object type, they include:
+.in +5
+.sp
+\(bu  button
+.br
+\(bu  text
+.br
+\(bu  panel
+.in -5
+.sp
+\f2name\f1 is a unique name for the object.  This name cannot match an
+object type name.  For example, you cannot have an object named
+\&"button".  The \f2geometry\f1 specification indicates where the object
+should be placed within the panel.  The position coordinates indicate
+a row and column rather than a pixel position.  For example:
+.in +5
+.sp
+.nf
+swm*panel.full:	\e
+ 	button	iconify	+0+0	\e
+ 	text	name	+1+0	\e
+ 	button	resize	-0+0	\e
+ 	panel	client	+0+1
+.fi
+.in -5
+.sp
+This example creates a panel called \f3full\f1 that contains several
+objects: the \f3iconify\f1 and \f3resize\f1 buttons, a \f3name\f1
+button, and the \f3client\f1 itself.  The \f3name\f1 object displays
+the reparented client's name.  The geometry specifications have the
+following effect: the \f3iconify\f1 object will be created as the
+leftmost object.  The \f3name\f1 object will be immediately to the
+right of the \f3iconify\f1 object.  The \f3resize\f1 object will be
+the rightmost.  The \f3client\f1 panel will be where the client window
+will be positioned in the panel.  It will be displayed beneath the
+above objects.  A special geometry specification can be used to center
+an object within a panel.  If the letter "C" is used as the X
+coordinate the object will be centered.  For example:
+.in +5
+.sp
+.nf
+swm*panel.full:	\e
+ 	button	iconify	+0+0	\e
+ 	text	name	+C+0	\e
+ 	button	resize	-0+0	\e
+ 	panel	client	+0+1
+.fi
+.in -5
+.sp
+This would cause the window name to be centered rather than be
+positioned just to the right of the iconify object.
+.IP "\f3resizeCursor\f1: \f2cursor\f1"
+This resource specifies the cursor shape to use when performing the
+window resize function.  The \f2cursor\f1 should be a name from the
+cursorfont.h file.  The default resize cursor is "sizing."
+.IP "\f3resizeFont\f1: \f2fontname\f1"
+This resource specifies the font used in the resize window, which
+appears when a window is being resized or moved.  The text in the
+resize window gives the current size (width x height) or coordinates
+(X, Y) of the window.
+.IP "\f3resize.font\f1: \f2fontname\f1"
+This can be used in place of the resizeFont resource.
+.IP "\f3resizeGrid\f1: [True | False]"
+This resource specifies whether a grid appears as well as an outline
+when a window is being moved or resized.  The default is True; the
+OpenLook+ template sets it to False.
+.IP "\f3resourceFile\f1: \f2filename\f1"
+This resource specifies a file name in which to write debug
+information about what resources swm is looking for.  It is useful to
+determine what resources are available to be specified when using swm.
+.IP "\f3restartPreviousState\f1: [True | False]"
+This resource causes swm to remember the state of client windows, and
+restore it when \f3swm\f1 restarts.  The default is True.  The state
+includes, for each window, whether it is iconified, the position of
+its icon on the root window, and whether it is sticky.  The state is
+not saved if the X server terminates.  To save the window layout for
+use in subsequent sessions, use the f.places function instead.
+.IP "\f3rootPanels\f1: \f2panel positions\f1"
+This resource allows you to place panels on the X root window.  Panels
+placed on the root window should not have a client panel within them,
+they are simply meant to be a static menu of operations to be
+performed.  The syntax of each panel position is:
+.sp
+.in +5
+\f3panel\f1 \f2panel-name\f1 \f2geometry\f1
+.sp
+.in -5
+The \f2panel-name\f1 is the name of a panel object created with the
+\f3panel \f1 resource.  The \f2geometry\f1 is the pixel coordinates of
+where to place the panel on the root window.  If a root panel contains
+a special panel called \f3icons,\f1 it will be an icon panel in which
+icons can be grouped.  The name of the icon panel will determine what
+icons are placed in the icon panel.  An icon panel named \f3XTerm\f1
+would contain all xterm icons.
+.sp
+Below are examples of creating icon panels:
+.sp
+.in +5
+	swm*rootPanels: panel   Xterm   -5+5
+.sp
+	swm*panel.Xterm: panel   icons   4x1+0+0
+.sp
+An icon panel named "Default" will catch all icons not caught by
+more specific icon panels.
+.in -5
+.IP "\f3text\f1.\f2text object name\f1: \f2text\f1"
+This resource creates a text object that contains the character string
+specified in \f2text.\f1 Multiple lines of text can be specified as
+multiple strings, for example:
+.in +5
+.sp
+.nf
+swm*text.foo:		\e
+ 	"this is line one"	\e
+ 	"this is line two"
+.fi
+.in -5
+.sp
+.IP "\f3virtual\f1.\f2resources\f1:"
+The \f3virtual\f1 resources are resources to be used on the small
+windows within the virtual desktop panner.  The \f2resources\f1 will
+be the standard set of resources gotten by all objects, these include:
+foreground, background, cursorForeground, cursorBackground, border,
+focusForeground, focusBackground, focusReverse, and cursor.
+.IP "\f3virtualDesktop\f1: \f2geometry\f1"
+This resource causes the virtual desktop feature of swm to be enabled
+and the virtual desktop created.  The resource specifies the size of
+the virtual desktop.  For example, the geometry\f3 5000x2000\f1 would
+cause the virtual desktop to be created with a size of 5000 pixels by
+2000 pixels.  The following resources are also available on the
+virtual desktop:
+.in +5
+.sp
+virtualDesktop.foreground:
+.br
+virtualDesktop.background:
+.br
+virtualDesktop.backgroundPixmap:
+.br
+virtualDesktop.cursor:
+.br
+virtualDesktop.cursorForeground:
+.br
+virtualDesktop.cursorBackground:
+.in -5
+.sp
+The following resources are only significant if the virtual desktop is
+enabled.
+.IP "\f3virtualDesktop.scrollBars\f1: [True | False]"
+This resource allows the user to disable the virtual desktop scroll
+bars.  The default is True, or display the scroll bars.
+.IP "\f3virtualDesktop.scrollBars.opaque\f1: [True | False]"
+This resource determines how the scroll bars on the virtual desktop
+operate.  If this resource is set to True, the virtual
+desktop will be panned when the scroll bar is moved.  If this resource
+is set to False, which is the default, the virtual desktop will not be
+panned when moving the scrollbar until the mouse button is released.
+.IP "\f3virtualDesktop.panner.\f2resource\f1:"
+Standard resources can be set on the panner object; they include:
+.in +5
+.sp
+virtualDesktop.panner.foreground:
+.br
+virtualDesktop.panner.background:
+.br
+virtualDesktop.panner.backgroundPixmap:
+.br
+virtualDesktop.panner.cursor:
+.br
+virtualDesktop.panner.cursorForeground:
+.br
+virtualDesktop.panner.cursorBackground:
+.in -5
+.IP "\f3virtualDesktop.panner.scale: \f2scale\f1"
+This resource controls the scale of the virtual desktop panner window.
+The size of the panner window is calculated by simply taking this
+scale number and dividing the virtual desktop dimensions by it:
+.in +5
+.sp
+panner_width = virtual_desktop_width / scale
+.br
+panner_height = virtual_desktop_height / scale
+.in -5
+.IP "\f3virtualDesktop.panner.geometry: \f2geometry\f1"
+This resource specifies the position of the panner.  If this resource
+is specified, the panner window's initial state will be NormalState
+unless overridden by the \f3initialState\f1 resource.  If this
+resource is not specified, the initial state of the panner window will
+be WithdrawnState and the \f3f.panner\f1 command must be executed to
+display the panner.
+.IP "\f3virtualDesktop.panner.grid\f1: \f2color\f1"
+This resource specifies a color and causes a grid of that color to be
+painted on the Virtual Desktop panner indicating screen boundaries.
+.IP "\f3virtualDesktop.panner.iconGeometry: \f2geometry\f1"
+This resource specifies the position of the panner icon.
+.IP "\f3virtualDesktop.panner.initialState: \f2state\f1"
+This resource specifies the initial state of the panner window.  Valid
+values for \f2state\f1 include \f3WithdrawnState,\f1
+\f3NormalState,\f1 and \f3IconicState.\f1
+.IP "\f3virtualDesktop.panner.showNames\f1: [True | False]"
+This resources controls whether or not window names are painted into
+the small ``virtual'' windows inside the panner.
+.IP "\f3xorValue\f1: \f2number\f1"
+This is the XOR value used when painting the resize/move outlines.  It
+is especially useful for color monitors to adjust which part of the
+colormap will be used to paint the pixels.
+.IP "\f3zap\f1: [True | False]"
+This resource specifies whether zap lines appear when a window is
+iconified or deiconified.  Zap lines are diagonal lines drawn from the
+corners of the icon location to the corners of the window location
+during the transition.
+.sp
+.SS Specific Resources
+.PP
+Specific resources may be specified on an object, client, or class
+specific basis.  The syntax for these resources is:
+.sp
+.in +5
+swm*\f2class\f1 | \f2client\f1 | \f2object\f1*\f2resource\f1
+.sp
+.in -5
+Some examples might include:
+.in +5
+.nf
+.sp
+swm*XTerm*foreground: red
+swm*xclock*decoration: none
+swm*resizeCorners: True
+swm*resizeBars: True
+.fi
+.in -5
+.sp
+The following specific resources can be specified:
+.in +5
+.IP "\f3background\f1: \f2pixel\f1"
+This resource specifies the default background color of objects
+created by swm.  The default is "white".
+.IP "\f3backgroundPixmap\f1: \f2file name\f1"
+This resource is used only by panel objects and specifies a bitmap
+file to use as the background image of a panel.  The \f3bitmapPath\f1
+resource is used to search for the file specified.
+.IP "\f3bevelWidth\f1: \f2number\f1"
+This resource specifies the width of the 3D bevel, if the model
+resource has been set to Motif.  The default bevel width is 2.
+.IP "\f3bindings\f1: \f2button and key bindings\f1"
+This resource defines the mouse and keyboard bindings for an object.
+The object is basically the context for the binding.  The syntax of a
+mouse button binding is:
+.sp
+.in +5
+.nf
+[Shift | Ctrl | Meta] <Btn[\f2 1-5\f1 ]>[ \f2clicks\f1 ] : functions
+.sp
+.fi
+.in -5
+The number following Btn is optional and if not specified, indicates
+any mouse button.  The brackets <> around the word Btn are literal.
+The \f2clicks\f1 is the number of mouse button clicks that are
+required before executing the function or functions.  If not
+specified, one click is assumed.
+.sp
+The syntax of a key press binding is similar to the mouse button and
+is as follows:
+.sp
+.in +5
+.nf
+[Shift | Ctrl | Meta] <Key>\f2key\f1 : functions.
+.sp
+.fi
+.in -5
+The \f2key\f1 value specifies which key should be pressed to invoke
+the function or functions.  The brackets <> around the word Key are
+literal.
+.sp
+Let's look at the panel object called \f3full\f1 that we defined
+earlier.  We could have the following bindings:
+.in +5
+.sp
+.nf
+swm*panel.full.button.iconify.bindings:	\e
+	<Btn>     :	f.iconify
+
+swm*panel.full.button.resize.bindings:	\e
+	<Btn>     :	f.resize
+
+swm*panel.full.panel.client.bindings:	\e
+	<Key>L1  	f.iconify
+.fi
+.in -5
+.sp
+This example does several things.  When a mouse button is pressed in
+the \f3iconify\f1 button, the f.iconify function is executed.  When a
+mouse button is pressed in the \f3resize\f1 button, the f.resize
+function is executed.  When the "L1" key is pressed while the pointer
+is in the client panel, the f.iconify function is executed.
+.IP "\f3border\f1: \f2color\f1"
+This resource specifies the border color of an object.  The default is
+black.
+.IP "\f3borderWidth\f1: \f2pixels\f1"
+This resource specifies the border width in pixels of an object.  The
+default is zero pixels.
+.IP "\f3constrain\f1: [True | False]"
+This resource indicates that windows should be kept on the screen
+during move operations.  This resource may be temporarily overridden
+by using the \f3f.forcemove\f1 function.  Note that this resource may
+be specified on a class basis so that only certain classes of windows
+are constrained.  The default is False.
+.IP "\f3cursor\f1: \f2cursor shape\f1"
+This resource specifies the cursor to display inside an object.  The
+default is "top_left_arrow".
+.IP "\f3cursorBackground\f1: \f2color\f1"
+This resource specifies the background color of the mouse cursor.
+The default is white.
+.IP "\f3cursorForeground\f1: \f2color\f1"
+This resource specifies the foreground color of the mouse cursor.
+The default is black.
+.IP "\f3decoration\f1: \f2panel\f1"
+This resource specifies the client panel to use to reparent a client.
+The \f2panel\f1 is the name of a panel that contains a panel object.
+Examples might include:
+.in +5
+.sp
+.nf
+swm*XClock*decoration:	none
+swm*XTerm*decoration:	full
+.fi
+.in -5
+.sp
+In the examples above, \f3full\f1 and \f3none\f1 are panel objects
+previously defined with the \f3panel\f1 resource.  See also the
+\f3transient.decoration\f1 resource.
+.IP "\f3defaultIconImage\f1: \f2bitmap-file\f1"
+This resource is now a class specific resource so that you can have
+.in +5
+.sp
+.nf
+swm*XTerm*defaultIconImage: @xterm.xbm
+swm*XLoad*defaultIconImage: @xload.xbm
+.fi
+.in -5
+.sp
+Rather than a single global default icon image bitmap.
+.IP "\f3fit\f1: [True | False]"
+This resource is used for icon panels.  It controls whether or not the
+icons in an icon panel are "fitted" to the new width of an icon panel
+after it has been resized.  The default is False.  Icons are fitted to
+the panel by filling the top row of the panel, then the next row, and
+so on until all the icons have been placed.
+.IP "\f3focusBackground\f1: \f2color\f1"
+This resource specifies the background color of object when the client
+panel has input focus.
+.IP "\f3focusBorder\f1: \f2color\f1"
+This resource specifies the border color of object when the client
+panel has input focus.
+.IP "\f3focusForeground\f1: \f2color\f1"
+This resource specifies the foreground color of object when the client
+panel has input focus.
+.IP "\f3focusModel\f1: \f2ClickToType\f1"
+If this resource is specified and ``ClickToType'' is specified, the
+input focus model will be click-to-type mode.  If this resource is not
+specified or contains some other value, input focus will be set to
+follow the mouse.
+.IP "\f3focusReverse\f1: [True | False]"
+This resource indicates that the foreground and background colors of
+an object should be swapped when the client panel has input focus.
+.IP "\f3followClient\f1: [True | False]"
+This resource is used only with icon regions.  When True, the default
+behavior, icons follow the client around the virtual desktop.  If a client 
+is iconified then  deiconified and moved to a different screen on
+the virtual desktop then iconified again the icon will appear in the 
+icon region on the current screen instead of its original location.
+.IP "\f3font\f1: \f2font name\f1"
+This resource specifies the font to use inside of an object.
+.IP "\f3foreground\f1: \f2color\f1"
+This resource specifies the default foreground color of objects
+created by swm.  The default is "black".
+.IP "\f3gravity\f1: "
+This resource is used with both panels and with icon regions.  When used
+with panels its value is one of:
+.in +5
+.sp
+[NorthGravity | SouthGravity | CenterGravity]"
+.in -5
+.sp
+This resource specifies the gravity of an object in a panel with
+respect to its parent.  The default gravity is North which means that
+the top of all objects in a row line up.  South gravity would mean
+that an object is placed such that its bottom edge will be flush with
+the bottom edge of its parent. Center gravity means that an object is
+centered in the row in which it is placed.
+.sp
+When used with icon regions its value is any combination of two orthogonal 
+directions:
+.sp
+.in +5
+[NorthWest | EastSouth ...]"
+.in -5
+.sp
+For example \f3swm*iconRegion*gravity: SouthWest\f1 sets the icon gravity
+to SouthWest for all icon regions defined with the iconRegions resource.
+.IP "\f3grayIcon\f1: [True | False]"
+This resource is specified on a client basis.  It determines whether
+the icon is displayed when the window is not in an iconic state.  If
+this resource is set to True, the icon will be "grayed" out when the
+client window is not in an iconic state.
+.IP "\f3hideWhenEmpty\f1: [True | False]"
+If this resource is set to True, an icon panel will be removed from
+the display when no icons are in the panel.  It will reappear when an
+icon is placed in the panel due to an iconify operation.
+.IP "\f3highlightFrame\f1: [True | False]"
+This resource applies if any of the following resources are enabled:
+focusForeground, focusBackground, or focusReverse.  In that case, when
+the pointer moves into a window, the window frame changes color.  If
+highlightFrame is True, the frame changes color when the pointer
+enters the frame, as opposed to when it enters the client window.
+.IP "\f3icon\f1: \f2panel\f1"
+This resource is specified on a client basis and is used to specify a
+panel to be used as the icon of a client.
+.IP "\f3iconPanel\f1: \f2panel\f1"
+This resource is specified on a client basis and is used to specify an
+icon panel in which to place the client's icon.
+.IP "\f2icon-panel-name\f1.\f3scrollBars\f1: [True | False]"
+This resource allows the user to disable the scroll bars on icon
+panels.  This effectively means that the icon panel will increase in
+size in order to accommodate all icons it contains.
+.IP "\f3iconRegion\f1: \f2icon-region-name\f1"
+This resource is specified on a client basis and is used to specify an
+icon region in which to place the client's icon.
+.IP "\f3ignoreGroupHints\f1: [True | False]"
+This resource determines swm's behavior when window group hints are
+specified for a window.  The default is False, or to use group hints.
+.IP "\f3ignorePPosition\f1: [True | False]"
+This resource determines whether \f3swm\f1 honors or ignores
+program-specified position hints for the placement of a window.  The
+default is False, meaning such hints are not ignored.  (User-specified
+hints are always honored, and override program-specified hints.)
+.IP "\f3ignorePPositionOrigin\f1: [True | False]"
+This resource determines whether \f3swm\f1 honors or ignores
+program-specified position hints, when the value of the coordinates
+given is 0,0.  The default is False, meaning such hints are honored.
+.IP "\f3insideBorderWidth\f1: \f2pixels\f1"
+This resource determines the width of the borders placed inside the
+normal window frame.  Only the OPEN LOOK template uses this, with a
+value of 1.
+.IP "\f3macro\f1: \f2macro-name\f1"
+This resource provides a list of commands to execute.  The macro can
+then be executed with an f.macro command.
+.IP "\f3model\f1: [Motif | OpenLook]"
+This resource controls how objects are painted.  If Motif is
+specified, objects can be rendered with a 3D bevel.  This bevel can be
+controlled with the bevelWidth resource.
+.IP "\f3nameObjects\f1: [True | False]"
+Setting this resource to True causes a WM_NAME property to be placed
+on every object created by swm.  This will cause more server resources
+to be used so may not be desirable on X terminals.  The default is
+False.
+.IP "\f3noIcon\f1: [True | False]"
+This resource determines whether or not a window can be iconified.
+The default is False, meaning windows can be iconified.
+.IP "\f3objectPad\f1: \f2pixels\f1"
+This variable is used only by panel objects and specifies the number
+of pixels to be used between objects within a panel.  The default is
+zero pixels.
+.IP "\f3overlay\f1: \f2pixels\f1"
+This variable is used only by icon regions and specifies the number of
+pixels used to offset icons once the region is full and the icons must
+be stacked.
+The default is 10 pixels.
+.IP "\f3pack\f1: [True | False]"
+This resource is used for icon panels.  It controls whether or not the
+icon panel is "packed" when an icon is deleted or moved out of an icon
+panel.  The default is False.  If it is set to True, when an icon is
+removed from a panel, its place is filled so there are no gaps.
+.IP "\f3packImmediate\f1: [True | False]"
+This resource is used only by icon regions.  It controls whether or not the
+icons in the region are packed when a hole is created.  True by default.
+A hole is created when a client dies or the icon moves out of the region.
+.IP "\f3pad\f1: \f2pixels\f1"
+This resource is used by panel objects and icon regions. It specifies the 
+number of pixels between the outside edge of the panel and children inside
+the panel.  The default is zero pixels.  For icon regions it specifies the
+number of pixels between icons, the default is one.
+.IP "\f3randomPlacement\f1: [True | False]"
+This resource indicates that windows without a specific geometry
+should be placed randomly on the display rather than prompting the
+user to place them.  Note that this resource can be specified on a
+class basis so that only windows of a specific class are randomly
+placed.
+.IP "\f3remoteExecution\f1: \f2string\f1"
+This resource specifies a string used during the f.places command to
+restart remote clients.  The string must be usable by the printf(3)
+command with three %s sequences in the string.  The first %s is replaced
+by the remote host name, the second %s is replaced with the server
+display name, and the third %s by the command to execute.
+The default is:
+.in +5
+.sp
+.na
+"machine=%s; cmd='DISPLAY=%s; PATH=/usr/bin/X11:/usr/ucb:/usr/bin; 
+%s < /dev/null > /dev/null 2>&1 &'; cmd=\\'$cmd\\'; 
+rsh -n $machine /bin/sh -c $cmd &";
+.ad
+.in -5
+.sp
+.IP "\f3resizeBackground\f1: \f2color\f1"
+This resource specifies a background color to be used for the resize
+corners and resize bars in OpenLook2d mode.
+This resource is ignored when swm is running in OpenLook3d or Motif mode.
+.IP "\f3resizeBars\f1: [True | False]"
+This resource causes resize bars to be placed on the top, bottom, and
+sides of a decoration panel.  The default is False.
+.IP "\f3resizeCorners\f1: [True | False]"
+This resource causes resize glyphs to be placed in the corners of a
+decoration panel.  Their size is determined by the resizeLength and
+resizeWidth parameters.  The default is False.
+.IP "\f3resizeLength\f1: \f2pixels\f1"
+This resource specifies the length of the resize corners, i.e. the
+dimension from the corner of the frame to either end of the resize
+corner.
+.IP "\f3resizeWidth\f1: \f2pixels\f1"
+This resource specifies the width of the resize corners and resize
+bars if they are enabled.  The default is 4 pixels.
+.IP "\f3rootIcon\f1: [True | False]"
+This resource is specified on a client basis and controls whether or
+not the icon for the client is displayed within an icon panel or on
+the root window.  If True is specified the icon will be displayed on
+the root window.  The default is False.
+.IP "\f3shape\f1: [True | False]"
+This resource is only valid if \f3swm\f1 has been compiled with
+-DSHAPE and the server is an X11R4 server with the Shape extension.
+It basically enables shaping of the object and is object specific.  If
+the object is a panel and shape is set to True, the panel will be
+shaped to contain all of its children.  Other objects will change
+shape only if the shapeMask resource is also set.
+.sp
+If the iconImage button has the shape resource set to True and a
+client application sets the icon_mask member of the WM_HINTS property,
+the iconImage button is shaped to the mask contained in the icon_mask
+member of WM_HINTS.
+.IP "\f3shapeMask\f1: \f2bitmap-file\f1"
+This resource combined with the shape resource allows you to make an
+object non-rectangular.  The bitmap-file used by this resource will
+specify the shape of the object: bits set represent areas within the
+window.  Any \f3swm\f1 object can have a shapeMask set on it.
+.IP "\f3showGrid\f1: [True | False]"
+This resource is used for icon panels.  It controls whether or not a
+grid is drawn on top of an icon panel to show the slot positions
+within the icon panel.  The default is False.
+.IP "\f3showOutline\f1: [True | False]"
+This variable enables or disables the display of the outline that is
+painted during window move and resize operations.  If False is
+specified, the grid will not be displayed.  However, during the
+move/resize, if any modifier key is pressed (Shift, Control, or Meta),
+the outline will be displayed while the key is down.
+.IP "\f3squeeze\f1: [True | False]"
+This resource specifies whether an icon panel is resized when an icon
+is removed.  The default is False.  If it is True, after an icon is
+removed, the icon panel size is adjusted so that the slot size is the
+same as the size of the largest remaining icon.
+.IP "\f3state\f1: \f2mapped-state\f1"
+This resource specifies the state of an object.  The following states
+are available.
+.sp
+\f3Mapped\f1 state means that the object is visible and takes up space
+within a panel.
+.sp
+\f3MappedNoSpace\f1 state means that the object is visible but takes
+up no space within a panel.
+.sp
+\f3Unmapped\f1 state means that the object is not visible but takes up
+space in the panel.
+.sp
+\f3UnmappedNoSpace\f1 state means the object is not visible and takes
+up no space in the panel.
+.sp
+These different states allow you to create a panel with objects that
+are not visible and then through the appropriate function, change the
+state of the object to make it visible.
+.IP "\f3sticky\f1: [True | False]"
+This resource allows you to have certain classes of windows reparented
+"sticky."  This resource is only looked for if the virtual desktop is
+enabled and if specified as \f3True\f1, causes the window to start up
+as sticky.  For example:
+.in +5
+.sp
+swm*xclock*sticky: True
+.in -5
+.sp
+This would cause any xclocks to be sticky when they are reparented.
+For a more complete explanation of sticky windows, see the section
+discussing the Virtual Desktop.
+.IP "\f3transient.decoration\f1: \f2panel\f1"
+This resource is similar to the decoration resource except that it
+applies only to transient decoration panels, such as pop-up windows.
+It allows a different, usually simpler, decoration for parts of a
+client application that appear for a short period of time.
+.in -5
+.sp
+.SS Functions
+.PP
+This section describes functions that are provided by swm.  These
+functions are used in the \f3binding \f1 resource as well as in menus.
+.P
+Most functions take an optional argument which affects the operation
+of the function.  The optional argument is a character string and
+should be specified between parentheses.  Usually the argument
+specifies a client; in these cases if no argument is supplied the
+client is selected using the mouse.
+.P
+Arguments which specify a client can be given in the following ways.
+If the character string starts with a "#" character, the remainder of
+the string is taken to be a window ID number.  If the character
+following the "#" character is a "$", it is taken to mean the current
+window.  If the character string does not begin with a "#" character,
+it is taken to be a class or name of a client on which the function
+should be performed.
+.P
+If the character string is "multiple" the function will be performed
+on each window selected by the mouse until a button click on the root
+window is performed.
+.P
+For example:
+.in +5
+.nf
+.sp
+f.raise(XTerm)	Raises all XTerm class or named windows
+f.lower(#$)	Lower the window that the pointer is currently on
+.fi
+.in -5
+.sp
+Note that in bindings and menu specifications, multiple commands can
+be executed by simply listing the functions to execute.  For example.
+.sp
+.in +5
+<Btn> : f.raise f.lower(foobar) f.exec("xterm &")
+.sp
+.in -5
+Would simply execute \f3f.raise\f1 on a selected window, \f3f.lower\f1
+on all windows matching the "foobar" class or name, and then
+\f3f.exec\f1 with the "xterm &" string.  Note that all functions have
+the concept of success or failure.  The \f3f.stop\f1 function
+following a successfully completed previous function will halt the
+execution of subsequent functions.
+.sp
+.IP "\f3Function\f1" 15
+\f3Description\f1
+.sp
+.IP "\f3f.autoresize\f1(\|\f2client\f1\|)"
+This command executes the resize command but does so by automatically
+determining from which edge of the window to start the resize.
+.IP "\f3f.beep\f1"
+This function sounds the bell on the workstation.
+.IP "\f3f.circledown\f1"
+This function causes the top window that is obscuring another window
+to drop to the bottom of the stack of windows.
+.IP "\f3f.circleup\f1"
+This function raises the lowest window that is obscured by other
+windows.
+.IP "\f3f.constrainmove\f1(\|\f2client\f1\|)"
+Execute a constrained move (keeps the window on the desktop).
+.IP "\f3f.deiconify\f1(\|\f2client\f1\|)"
+This function deiconifies a window.  If the window is not iconic the
+function fails.
+.IP "\f3f.delete\f1(\|\f2client\f1\|)"
+This function causes the window to be deleteed by using the
+WM_DELETE_WINDOW protocol.  If the WM_DELETE_PROTOCOL is not present,
+WM_SHUTDOWN and WM_SAVE_YOURSELF will also be attempted.  If no
+protocols are specified, this function simply terminates the client's
+connection to the server.
+.IP "\f3f.destroy\f1(\|\f2client\f1\|)"
+This function simply terminates the client's connection to the server.
+.IP "\f3f.dump\f1(\|\f2client\f1\|)"
+This is a diagnostic command that will print the hierarchy of a
+selected object to stdout.
+.IP "\f3f.exec\f1(\|\f2unix command\f1\|)"
+This function must have a string specified and passes it to /bin/sh
+for execution.  If swm is operating on multiple screens and the string
+starts a new X client without giving a display argument, the client
+will appear on the screen from which this function was invoked.  Backslash
+may be used as an escape character; two backslashes are necessary when
+one is to appear in the resulting command string.
+.IP "\f3f.falsestop\f1"
+This function is the opposite of f.stop.  While f.stop stops execution
+of a series of functions if the previous function succeeded,
+f.falsestop stops execution if the previous function failed.
+.IP "\f3f.focus\f1(\|\f2client\f1\|)"
+Explicitly set the input focus to a client window until another
+f.focus or f.unfocus is executed.
+.IP "\f3f.focuscolor\f1(\|\f2client\f1\|)"
+This command causes the colormap focus to be directed to the client until 
+another f.focuscolor command is executed or the client is withdrawn.
+.IP "\f3f.forcemove\f1(\|\f2client\f1\|)" 
+This function allows you to move a window while temporarily
+overridding the \f3constrain\f1 resource.
+.IP "\f3f.freezedesktop\f1"
+This command freezes the appearance of the Virtual Desktop and
+any windows on the Virtual Desktop.  If the Virtual Desktop
+is not enabled, the actual root window and its contents will
+be frozen.  Note that this command does not freeze the appearance of
+sticky windows and should only be used in conjunction with
+the f.thawdesktop command.
+.IP "\f3f.gravity\f1(\|multiple\|)"
+The function gives the icon gravity and moves it into the proper place with 
+other icons which have gravity.
+The "multiple" argument indicates the user is to interactively select 
+multiple icons.
+.IP "\f3f.group\f1(\|multiple\|)"
+This function places clients in a window group.  The "multiple"
+argument indicates the user is to interactively select each of the
+windows to be grouped.
+.IP "\f3f.hardrestart\f1"
+This command causes \f3swm\f1 to perform a hard restart.  By default,
+the f.restart command attempts to remember the size and position of
+\f3swm\f1's internal windows, such as the panner and root panels.  The
+f.hardrestart command causes \f3swm\f1 to not remember the size and
+location of internal \f3swm\f1 windows.
+.IP "\f3f.horizoom\f1(\|\f2client\f1\|)" 
+This function changes the size of the client window to be the same as
+the width of the display.
+.IP "\f3f.iconify\f1(\|\f2client\f1\|)" 
+This function iconifies the selected window.  If the window is already
+iconic, the function fails.
+.IP "\f3f.info\f1"
+This command pops up a dialog box containing the version number of swm 
+and pictures of the authors.
+.IP "\f3f.kill\f1(\|\f2client\f1\|)" 
+This function simply terminates the client's connection to the server.
+.IP "\f3f.lower\f1(\|\f2client\f1\|)" 
+This function lowers the window to the bottom of the stacking order.
+.IP "\f3f.macro\f1(\|\f2macro\f1\|)" 
+This function executes a function macro.  Macros are specified using
+the \f3macro\f1 resource.
+.IP "\f3f.map\f1(\|\f2object\f1\|)
+This function uses the optional argument to refer to an object within
+a decoration, icon definition, or root panel.  It causes the object to
+be made visible.
+.IP "\f3f.menu\f1(\|\f2menu\f1\|)" 
+This function causes the menu whose name is given by the \f2menu\f1
+argument to be popped up.  If used in the context of a menu
+definition, it causes a pull-right menu to be displayed.
+.IP "\f3f.move\f1(\|\f2client\f1\|)" 
+This function allows you to move a window.  If the mouse is not moved
+more than \f3moveDelta\f1 or another mouse button is pressed during
+the move operation the move fails.
+.IP "\f3f.moveopaque\f1(\|\f2client\f1\|)" 
+This function allows you to move a window opaquely.  If the mouse is
+not moved more than \f3moveDelta\f1 or another mouse button is pressed
+during the move operation the move fails.
+.IP "\f3f.newbuttonimage\f1(\|\f2object-name, button-image\f1\|)"
+This command allows a button's appearance to be changed dynamically.
+The \f2object-name\f1 is the name of the object, typically in the
+decoration panel or an icon specification panel.  The
+\f2button-image\f1 string is either a bitmap file or a text string.
+If the string is a bitmap filename, it must be preceded by 
+an @ character.
+For examples of this command, see the
+OpenLook+ template file.
+.IP "\f3f.nop\f1" 
+This function does nothing.
+.IP "\f3f.owner\f1"
+This command should be executed on a window group
+member or a WM_TRANSIENT_FOR window.  It will briefly
+flash the decoration of the group leader or the
+WM_TRANSIENT_FOR window.
+.IP "\f3f.pack\f1(\|\f2iconpanel\f1\|)" 
+This function causes an icon panel to be "packed", which means that
+when an icon is removed from a panel, its place is filled so there are
+no gaps.
+.IP "\f3f.panner\f1" 
+This function causes the virtual desktop panner to be displayed.  If
+it is already displayed, the function fails.
+.IP "\f3f.pin\f1(\|\f2client\f1\|)"
+This function and f.unpin are only used for OPEN LOOK clients.  The
+property _OL_PIN_STATE is set by f.pin and cleared by f.unpin.  The
+property tells the client whether to keep a dialog or menu posted
+continuously.
+.IP "\f3f.places\f1(\|\f2file\f1\|)"
+This command will save X startup information in a file.  This file is
+suitable as a .xinitrc replacement.  By default, this command writes
+the file .swm.restart in the user's home directory.  The following
+command could be used to overwrite an existing .xinitrc file:
+.in +5
+.sp
+f.places("~/.xinitrc")
+.in -5
+.sp
+.IP "\f3f.query\f1(\|\f2??\f1\|)"
+This command allows the user to query information about a client
+window.  It will return a success or failure value usable by the
+f.stop or f.falsestop commands.  The current information that can be
+queried would be specified as follows:
+.nf
+.in +5
+.sp
+f.query("sticky")   	is the window sticky?
+f.query("zoomed")	is the window currently zoomed?
+f.query("vertzoomed")	is the window vertically zoomed?
+f.query("horizoomed")	is the window horizontally zoomed?
+f.query("iconic")    	is the window iconic?
+.fi
+.in -5
+.sp
+.IP "\f3f.quit\f1" 
+This function causes swm to exit.
+.IP "\f3f.raise\f1(\|\f2client\f1\|)" 
+This function raises the window to the top of the stacking order.
+.IP "\f3f.raiselower\f1(\|\f2client\f1\|)" 
+This function raises the window to the top of the stacking order if it
+is obscured by any other windows.  If the window is unobscured, the
+window is lowered to the bottom of the stacking order.
+.IP "\f3f.rebind\f1(\|\f2object-name, bindings-name\f1\|)"
+This command allows the user to bind a new set of bindings to an
+object.  The \f2object-name\f1 is the name of the object, typically in
+the decoration panel or an icon specification panel.  For examples of
+this command, see the OpenLook+ template file.
+.IP "\f3f.refresh\f1" 
+This function causes all windows to be refreshed.
+.IP "\f3f.regroup\f1(\|\f2client\f1\|)"
+This function restores the group number of a client to the value that
+was saved at the time the client was ungrouped by f.ungroup.
+.IP "\f3f.reshuffle\f1(\|\f2client\f1\|)" 
+This function sorts the icons with gravity, eliminating holes created by clients which have died or icons that no longer have gravity.
+Sticky icons are placed ahead of non-sticky icons.
+Icons on other parts of the virtual desktop will be reshuffled if sticky icons are present.
+.IP "\f3f.resize\f1(\|\f2client\f1\|)" 
+This function allows you to resize a window.  If another mouse button
+is pressed during the resize operation, the resize function fails.
+.IP "\f3f.restart\f1" 
+This function causes the window manager to restart.
+.IP "\f3f.restore\f1(\|\f2client\f1\|)" 
+This function restores the client window to the location and size
+previous saved with f.save.
+.IP "\f3f.restorepointer\f1" 
+This function restores the pointer to the f.savepointer'ed position on
+the current screen.
+.IP "\f3f.restorevdt\f1"
+Restore the Virtual Desktop to the position that was saved via
+f.savevdt.
+.IP "\f3f.roundup\f1"
+This command searches each managed screen for windows that are
+not visible because of negative coordinates.  Each window found
+will have its negative coordinates set to zero, moving the window
+so that it can be seen.
+.IP "\f3f.save\f1(\|\f2client\f1\|)"
+This function will save the current location and size of a client.
+.IP "\f3f.savevdt\f1"
+Save the current position of the Virtual Desktop.
+.IP "\f3f.savepointer\f1"
+This function saves the current position of the pointer on the current
+screen.
+.IP "\f3f.scroll\f1(\|\f2position\f1\|)"
+This function uses the optional string as the position to which to
+scroll to in the virtual desktop.  The position is specified in
+geometry format.  For example, a position of "+3+2" would mean to
+scroll to the fourth screen in the X direction and the third screen in
+the Y direction.
+.IP "\f3f.scrolldown\f1(\|\f2screens\f1\|)"
+This function will scroll down in the virtual desktop display by
+one screenful.  If the optional argument contains a number, that many
+screenfuls are scrolled.
+.IP "\f3f.scrollhome\f1"
+This function will position the virtual desktop at the "home" position
+(0, 0).
+.IP "\f3f.scrollleft\f1(\|\f2screens\f1\|)"
+This function will scroll left in the virtual desktop display by
+one screenful.  If the optional argument contains a number, that many
+screenfuls are scrolled.
+.IP "\f3f.scrollright\f1(\|\f2screens\f1\|)"
+This function will scroll right in the virtual desktop display by
+one screenful.  If the optional argument contains a number, that many
+screenfuls are scrolled.
+.IP "\f3f.scrollsave\f1"
+This command saves the current location of the virtual desktop
+to the last saved position. This is useful for scrolling 
+between two areas of the virtual desktop.
+.IP "\f3f.scrollto\f1(\|\f2client\f1\|)"
+Allows the user to scroll the Virtual Desktop to a specific client.
+The most useful way to use this command is to bind a key to the client
+window to execute this command.  Then place the mouse cursor on the
+corresponding window in the panner and hit the key.  The Virtual
+Desktop will be scrolled to contain the window.
+.IP "\f3f.scrollup\f1(\|\f2screens\f1\|)"
+This function will scroll up in the virtual desktop display by one
+screenful.  If the optional argument contains a number, that many
+screenfuls are scrolled.
+.IP "\f3f.setdesktop\f1(\f2[bg-color], [fg-color], [bitmap-file]\f1\|)"
+This command is a simplified form of the \f3ssetroot\f1\|(1)
+utility.  It allows you to change the appearance of
+the desktop.  If no parameters are specified, the
+background of the desktop is changed to the
+``root_weave'' pattern.  If bg-color is the only parameter
+specified, the desktop is set to the solid color
+indicated by bg-color.  If bitmap-file is specified,
+the desktop is tiled with the image of the
+bitmap-file using foreground and background colors
+specified in fg-color and bg-color.
+.IP "\f3f.shutdown\f1(\|\f2client\f1\|)"
+This function deletes the client window using the WM_SHUTDOWN or
+WM_SAVE_YOURSELF protocols.  If no protocols exist, this function
+simply terminates the client's connection to the server.
+.IP "\f3f.squeeze\f1(\|\f2iconpanel\f1\|)"
+This function executes a squeeze operation on an icon panel.  The icon
+panel size is adjusted so that the slot size is the same as the size
+of the largest remaining icon.
+.IP "\f3f.stick\f1(\|\f2client\f1\|)"
+This function will cause the selected window to become sticky.  See
+the Virtual Desktop section for a complete discussion of sticky
+windows.
+.IP "\f3f.stop\f1"
+This function will cause following functions to be ignored if the
+immediately previous function executed successfully.  For example:
+.sp
+<Btn>:f.deiconify(foo) f.raise(foo) f.stop f.exec("xterm -name foo &") \en
+.sp
+This example would attempt to execute
+\f3f.deiconify\f1
+and 
+\f3f.raise\f1
+on the window named "foo".  If the
+\f3f.raise \f1
+is successful, the 
+\f3f.exec\f1
+will not be executed.
+.IP "\f3f.sweep\f1"
+This command allows the user to outline a number of windows or icons
+on the desktop and then move them as a group.  Sticky and non-sticky
+windows cannot be outlined together, non-sticky windows will always
+have priority over sticky windows.  Another f.sweep or an f.unsweep
+command will ungroup the windows.
+.IP "\f3f.thawdesktop\f1"
+This command works in conjunction with the f.freezedesktop
+command.  It allows the Virtual Desktop and windows on the
+desktop to redisplay their contents.
+.IP "\f3f.title\f1"
+Used in a menu specification, this function indicates the preceding
+string is used as the title of a menu.
+.IP "\f3f.titlepin\f1" 
+Used in a menu specification, this function indicates the preceding
+string is used as the title of a menu with a pushpin.
+.IP "\f3f.unfocus\f1"
+Set the input focus such that it follows the pointer.
+.IP "\f3f.ungroup\f1(\|\f2client\f1\|)" 
+This function removes a window from a group.
+.IP "\f3f.unmap\f1(\|\f2object\f1\|)" 
+This function uses the optional argument as the name of an object
+within a decoration, icon definition, or root panel to unmap.
+.IP "\f3f.unpin\f1(\|\f2client\f1\|)"
+This function and f.pin are only used for OPEN LOOK clients.  The
+property _OL_PIN_STATE is set by f.pin and cleared by f.unpin.  The
+property tells the client whether to keep a dialog or menu posted
+continuously.
+.IP "\f3f.unstick\f1(\|\f2client\f1\|)"
+This function will cause a sticky window to become unsticky.  See the
+Virtual Desktop section for a complete discussion of sticky windows.
+.IP "\f3f.unsweep\f1"
+Ungroup the windows that were outlined in the f.sweep command.
+.IP "\f3f.vertzoom\f1(\|\f2client\f1\|)" 
+This function causes the client window to be resized such that its
+height is the same as the screen.
+.IP "\f3f.warphorizontal\f1(\|\f2pixels\f1\|)" 
+This function warps the pointer some number of pixels in a horizontal
+direction.  The optional argument specifies the number of pixels to
+move the pointer.
+.IP "\f3f.warpsave\f1"
+Save the current location of the mouse cursor and then warp the mouse
+cursor to the last saved location.  This command is useful for
+toggling the mouse cursor between two locations.
+.IP "\f3f.warpto\f1(\|\f2client\f1\|)" 
+This command warps the pointer to the selected client.
+.IP "\f3f.warptoscreen\f1(\|\f2screen\f1\|)" 
+This function warps the pointer to a specified screen on a multiple
+screen display.  If no argument is given, the pointer is warped to the
+next screen.  The position the pointer is warped to is the last
+\f3f.savepointer\f1 position.
+.IP "\f3f.warpvertical\f1(\|\f2pixels\f1\|)" 
+This function warps the pointer some number of pixels in a vertical
+direction.  The optional argument specifies the number of pixels to
+move the pointer.
+.IP "\f3f.winrefresh\f1(\|\f2client\f1\|)" 
+This function is similar to the \f3f.refresh\f1 function, but allows
+you to refresh a single window.
+.in -5
+.IP "\f3f.zoom\f1(\|\f2client\f1\|)" 
+This function causes the client window to be resized such that its
+height and width are the same as the screen.
+.sp
+.SS Functions From Outside
+.PP
+\f3swm\f1 functions can also be executed from other programs by
+updating the property \f3_SWM_COMMAND\f1 on the root window of the
+display on which swm is running.  An example program that does this is
+\f3swmcmd\f1\|(1).
+.sp
+.SH FILES
+.IP "/usr/lib/X11/swm"
+Directory containing configuration files and bitmaps for icons and buttons.
+.IP "$HOME/.Xdefaults"
+Contains a reference to the desired configuration file and/or a
+customization file defined by the user.  (See DESCRIPTION.)
+.IP "/usr/lib/X11/swm/vdt.c"
+Example C program to return the window ID of the Virtual Desktop window.
+.sp
+.SH SEE ALSO
+.PP
+\f3ssetroot\f1\|(1), \f3swmcmd\f1\|(1), 
+\f3swmxlate\f1\|(1), \f3X\f1\|(1), \f3xhost\f1\|(1), \f3xrdb\f1\|(1)
+.sp
+.ne 5
+.SH DIAGNOSTICS
+.TP 5
+\f3Decoration file not found for \f2client\f1
+This notice occurs if no configuration file was specified in the
+user's .Xdefaults file or the file used by \f3xrdb\f1.
+.SH BUGS
+.PP
+Some X applications may not work properly with the virtual desktop
+feature of the OpenLook+ configuration file, because they aren't
+prepared to receive the larger coordinate values that may occur during
+a window move.  Such applications should be kept in the upper-left
+portion of the virtual desktop.
+.PP
+Another problem can occur when an application which is sticky opens a
+window; this can result in the new window being concealed by the
+previous window.  Such applications should not be made sticky.
+.PP
+The f.sweep command currently cannot be executed from a button.  It
+must be executed from a button press on the root window or from a
+pop-up menu.
+.PP
+Executing two mouse-driven \f3swm\f1 commands in rapid succession 
+may cause an hourglass cursor to appear. If this happens, release the
+mouse button and try again.
+.sp
+.SH COPYRIGHT
+.PP
+Copyright 
+.if t \(co
+, ParcPlace Systems, Inc.
+.PP
+\f3ParcPlace\f1, \f3Virtual Desktop\f1,
+and the ParcPlace logo are trademarks of ParcPlace Systems, Inc.
+.PP
+\f3OPEN LOOK\f1 is a trademark of AT&T, Inc.
+.PP
+\f3Motif\f1 is a trademark of the Open Software Foundation, Inc.
+.SH AUTHORS
+.PP
+Tom LaStrange and Kelly Rise, ParcPlace Systems, Inc.

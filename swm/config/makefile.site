@@ -1,0 +1,14 @@
+include ../../config.mk
+include config.mk
+LEVELS = ../..
+
+all:
+clean:
+clobber:
+depend:
+
+install:
+	-@if [ ! -d $(APPDEFDIR)/swm ] ; then \
+		mkdir -p $(APPDEFDIR)/swm ; fi
+	@$(INSTALL) $(INSTDATFLAGS) $(FILES) $(APPDEFDIR)/swm
+

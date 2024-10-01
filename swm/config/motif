@@ -1,0 +1,128 @@
+#**********************************************************************
+#
+#    Swm template for 14 point Motif
+#        The first few lines here are the only ones that need
+#        to be changed to get different point sizes
+#
+#    Author: Tom LaStrange
+#    Date:   07/28/89
+#
+#**********************************************************************
+
+Swm*font: -adobe-courier-medium-r-normal--14-140-75-75-m-90-iso8859-1
+Swm*button.name.font: -adobe-courier-bold-r-normal--14-140-75-75-m-90-iso8859-1
+Swm*button.menu: @Mmenu14.xbm
+Swm*button.min: @Mmin14.xbm
+Swm*button.max: @Mmax14.xbm
+Swm*panel.motif.resizeWidth: 5
+Swm*panel.motif.resizeLength: 21
+Swm*model: Motif
+
+
+# What the mouse buttons do on the root window
+Swm*root.bindings: \
+    <Btn3> : f.menu(workspace) \n
+
+# the default window decoration
+Swm*decoration: motif
+Swm*panel.motif: \
+    button menu		+0+0 \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*button.name.state: MappedNoSpace
+# transient window decoration
+Swm*transient.decoration: transientMotif
+Swm*panel.transientMotif: \
+    panel client	+0+0
+
+# turn on the resize corners
+Swm*panel.motif.resizeCorners: True
+Swm*panel.motif.resizeBars: True
+Swm*panel.motif.borderWidth: 1
+Swm*panel.transientMotif.resizeCorners: True
+Swm*panel.transientMotif.resizeBars: True
+Swm*panel.transientMotif.borderWidth: 1
+
+# bindings for the title bar and surrounding frame
+Swm*panel.motif.bindings: \
+    <Btn1> : f.move f.raise \n
+Swm*panel.transientMotif.bindings: \
+    <Btn1> : f.move f.raise \n
+
+# center the name in the title bar
+Swm*button.name.gravity: Center
+
+# pulldown button when the window is not zoomed
+Swm*button.pullDown1.state: MappedNoSpace
+Swm*button.pullDown1.bindings: \
+    <Btn3> : f.menu(windowMenu1) \n
+
+# pulldown button when the window is zoomed
+Swm*button.pullDown2.state: UnmappedNoSpace
+Swm*button.pullDown2.bindings: \
+    <Btn3> : f.menu(windowMenu2) \n
+
+# non zoomed window menu
+Swm*menu.windowMenu1: \
+    Window		f.title \
+    Close		f.iconify \
+    "Full Size"		f.map(pullDown2) f.raise f.save f.zoom \
+    "Properties..."	f.nop \
+    Back		f.lower \
+    Refresh		f.winrefresh \
+    Quit		f.delete
+
+# zoomed window menu
+Swm*menu.windowMenu2: \
+    Window		f.title \
+    Close		f.iconify \
+    "Restore Size"	f.map(pullDown1) f.restore \
+    "Properties..."	f.nop \
+    Back		f.lower \
+    Refresh		f.winrefresh \
+    Quit		f.delete
+
+# the default icon
+Swm*icon: Xicon
+Swm*panel.Xicon: \
+    button iconImage	+c+0 \
+    button iconName	+c+1
+Swm*defaultIconImage: @xlogo32
+
+Swm*panel.Xicon.borderWidth: 1
+Swm*panel.Xicon.bindings: \
+    <Btn1> : f.move f.raise \n \
+    <Btn3> : f.menu(iconMenu) \n
+
+# the icon menu
+Swm*menu.iconMenu: \
+    Window		f.title \
+    Open		f.deiconify \
+    "Full Size"		f.map(pullDown2) f.raise f.save f.zoom f.deiconify \
+    "Properties..."	f.nop \
+    Back		f.lower \
+    Refresh		f.winrefresh \
+    Quit		f.delete
+
+# the workspace (root window) menu
+Swm*menu.workspace: \
+    Workspace		f.titlepin \
+    Programs		f.menu(programs) \
+    Utilities		f.menu(utilities) \
+    "Properties..."	f.nop \
+    Restart		f.restart \
+    Exit		f.quit \
+
+Swm*menu.programs: \
+    xterm		f.exec("xterm&") \
+    xclock		f.exec("xclock&")
+
+Swm*menu.utilities: \
+    Refresh		f.refresh \
+    "Window Controls..."	f.nop \
+    "Clipboard..."	f.nop \
+    "Print Screen"	f.nop
+

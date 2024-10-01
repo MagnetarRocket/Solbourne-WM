@@ -1,0 +1,40 @@
+.\" @(#)swmxlate.1 89/10/13 VES; 
+.TH SWMXLATE 1 "13 October 1989" 
+.sp 
+.SH NAME
+\f3swmxlate\f1 \(em Translate virtual root coordinates
+.sp 
+.SH SYNOPSIS 
+.PP 
+\f3swmxlate -geometry\f1 +\f2Xcoord\f1\|+\f2Ycoord\f1
+.br
+\f3swmxlate -g\f1 +\f2Xcoord\f1\|+\f2Ycoord\f1
+.sp 
+.SH DESCRIPTION 
+.PP
+This command is used when starting applications in conjunction with
+the virtual root feature of the \f3swm\f1\|(1) window manager under X.
+Its purpose is to translate coordinates from the standard root window
+coordinate system to the virtual root coordinates that are needed
+when the screen currently displayed is not the home screen.
+.PP
+For example, to start an xterm at position (100,100) in the currently displayed
+area, use the following command:
+.sp
+.in +5
+\f(CWxterm -g `swmxlate -g +100+100`\f1
+.in -5
+.sp
+.SH SEE ALSO
+.PP
+\f3swm\f1\|(1), \f3X\f1\|(1), \f3xterm\f1\|(1)
+.\"\f2swm User's Guide\f1
+.sp
+.SH COPYRIGHT
+.PP
+Copyright \(co, ParcPlace Systems, Inc.
+.sp
+.SH AUTHOR
+.PP
+Tom LaStrange, ParcPlace Systems, Inc.
+

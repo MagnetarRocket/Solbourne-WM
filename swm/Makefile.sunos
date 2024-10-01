@@ -1,0 +1,74 @@
+# the name of your C++ compiler
+C++ = CC
+
+# where the OI headers are installed
+OIINCDIR=
+
+# where the OI libraries are installed
+OILIBDIR=/usr/lib
+
+INCDIRS = -I. -I$(OIINCDIR) -I/usr/include/X11/ -I$(OPENWINHOME)/include/
+
+C++FLAGS=$(INCDIRS)
+
+LDFLAGS=
+
+.SUFFIXES: .C .y .l .o
+
+.C.o:
+	$(C++) -c $(C++FLAGS) $*.C
+
+OTHERLIB = -L/usr/ucblib -lucb -lelf
+OILIB = -L$(OILIBDIR) -lOI
+XLIB = -lXext -lX11
+
+LIBS=$(OILIB) $(XLIB)
+
+OFILES=\
+	gram.o \
+	lex.o \
+	atoms.o \
+	bitmap.o \
+	button.o \
+	cursor.o \
+	debug.o \
+	events.o \
+	execute.o \
+	swmhelp.o \
+	icons.o \
+	init.o \
+	list.o \
+	main.o \
+	menus.o \
+	move.o \
+	object.o \
+	pan.o \
+	panel.o \
+	parse.o \
+	quarks.o \
+	reparent.o \
+	resize.o \
+	region.o \
+	text.o \
+	util.o \
+	version.o \
+	wmdata.o
+
+
+swm: $(OFILES)
+	$(C++) $(LDFLAGS) $(FORWARD_O_FILES) $(LIBS) -o swm
+
+gram.o: gram.H
+	$(C++) -c $(C++FLAGS) gram.C
+
+gram.H: gram.Y
+	yacc -d gram.Y
+	mv y.tab.h gram.H
+	mv y.tab.c gram.C
+
+lex.C: gram.H lex.L
+	lex -t lex.L > lex.C
+
+gram.C: gram.Y
+	yacc gram.Y
+	mv y.tab.c gram.C

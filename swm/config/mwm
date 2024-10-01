@@ -1,0 +1,128 @@
+!**********************************************************************
+!
+!    Swm template for mwm
+!
+!    Author: Kelly Rise
+!    Date:   11/01/90  	moved mwm to mwm.com, only non common parts in
+! 			this file
+!            12/04/90   toml - added _MOTIF_WM_HINTS support
+!
+!    $Id: mwm,v 9.7 1990/12/26 09:08:16 toml Exp $
+!
+!**********************************************************************
+swm*configuration:	mwm.com
+
+! What the mouse buttons do on the root window
+Swm*root.bindings: \
+    <Btn3> : f.menu(workspace) \n
+
+! the default window decoration
+Swm*decoration: motif
+Swm*panel.motif: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+! transient window decoration
+Swm*transient.decoration: motif.2
+Swm*transient*resizeCorners: True
+Swm*transient*resizeBars: True
+
+!**********************************************************************
+! The following panel definitions are to support the _MOTIF_WM_HINTS
+! property.  The bits are specified as follows:
+!
+!          3                   2                1               0
+! MWM_DECOR_MAXIMIZE  MWM_DECOR_MINIMIZE  MWM_DECOR_MENU  MEM_DECOR_TITLE
+!
+!**********************************************************************
+
+Swm*panel.motif.0: \
+    panel client	+0+1
+	
+Swm*panel.motif.1: \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.2: \
+    button menuB	+0+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.3: \
+    button menuB	+0+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.4: \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.5: \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.6: \
+    button menuB	+0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.7: \
+    button menuB	+0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.8: \
+    button max		-0+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.9: \
+    button max		-0+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.10: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.11: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.12: \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.13: \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.14: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
+Swm*panel.motif.15: \
+    button menuB	+0+0 \
+    button max		-0+0 \
+    button min		-1+0 \
+    button name		+c+0 \
+    panel client	+0+1
+
